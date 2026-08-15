@@ -127,8 +127,3 @@
   .prose strong { color:var(--text); font-weight:500; }
   .updated { font-size:.85rem; color:var(--text-3); }
 
-  /* Unmissable while these are unreviewed. Delete the markup, not just
-     the styling, once a solicitor has been through them. */
-  .draft { border:1px solid var(--amber); background:var(--amber-bg); color:var(--amber);
-           border-radius:var(--radius); padding:1rem 1.25rem; margin:2rem 0; font-size:.92rem; }
-  .draft strong { color:var(--amber); }
