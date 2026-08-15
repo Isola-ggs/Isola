@@ -7,6 +7,7 @@
 <meta name="description" content="Epic posts an estimate, then revises it 30 days later. Isola keeps a payout record every collaborator can see and nobody can quietly edit." />
 <meta property="og:title" content="Isola" />
 <meta property="og:description" content="Split island payouts without the spreadsheet argument." />
+<link rel="icon" type="image/png" href="/favicon.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -19,6 +20,7 @@
     <a href="/" class="mark">Isola</a>
     <div class="links">
       <a href="#how" class="quiet">How it works</a>
+      <a href="#discord" class="quiet">Discord</a>
       <a href="#pricing" class="quiet">Pricing</a>
       <a href="/demo.html" class="quiet">Demo</a>
       <a href="https://app.isola.gg" class="btn">Sign in</a>
@@ -153,16 +155,51 @@
           balance, what was credited, what was paid, closing balance.</p>
       </div>
       <div class="card">
-        <h3>Discord</h3>
-        <p>Balances and approvals where your team already is.
-          <code>/balance</code>, <code>/approve</code>, and replies only you can see.</p>
-      </div>
-      <div class="card">
         <h3>Expenses and advances</h3>
         <p>Art commissions come off the island before it&rsquo;s split. Recoupable
           advances clear automatically and never push anyone negative.</p>
       </div>
     </div>
+  </section>
+
+
+  <section id="discord">
+    <div class="eyebrow">Discord</div>
+    <h2>Your team already has a server. Isola works in it.</h2>
+    <p class="lede">Balances and approvals without anyone opening a dashboard.
+      Replies are private to whoever ran the command, so nobody learns what
+      anyone else is owed.</p>
+
+    <div style="margin-top:2rem">
+      <div class="chat">
+        <div class="cmd">/<b>statement</b></div>
+        <div class="line">
+          <strong>Neon Heist Studio</strong> — statement of account<br>
+          <span class="date">2026-09-02</span> Provisional share of 2026-09 <span class="up">+$3,098.40</span><br>
+          <span class="date">2026-10-30</span> Reversal of provisional estimate <span class="down">−$3,098.40</span><br>
+          <span class="date">2026-10-30</span> Final share of 2026-09 <span class="up">+$2,990.00</span><br>
+          <span class="date">2026-11-03</span> Part payment, rest to follow <span class="down">−$1,495.00</span>
+        </div>
+        <div class="owed">Owed to you: $1,495.00</div>
+        <div class="only-you">Only you can see this</div>
+      </div>
+
+      <div class="chat">
+        <div class="cmd">/<b>approve</b></div>
+        <div class="line">
+          <strong>Neon Heist Studio</strong> — split version 2 needs your approval<br>
+          Maya R. 40% · Dev K. 30% · Sam T. 20% · Jordi P. 10%
+        </div>
+        <div class="btns"><span class="yes">Approve</span><span class="no">Reject</span></div>
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <a href="https://discord.com/oauth2/authorize?client_id=1538270385336881263&scope=bot+applications.commands" class="btn solid" target="_blank" rel="noopener">Add Isola to Discord</a>
+      <a href="/demo.html" class="btn">See the rest</a>
+    </div>
+    <p class="small muted" style="margin-top:1rem">Four commands: balance, statement, approve, link.
+      Isola never reads your messages &mdash; it cannot, and does not ask to.</p>
   </section>
 
   <section id="pricing">

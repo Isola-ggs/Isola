@@ -127,3 +127,38 @@
   .prose strong { color:var(--text); font-weight:500; }
   .updated { font-size:.85rem; color:var(--text-3); }
 
+
+  /* Discord showcase. Styled to read as a chat without borrowing
+     Discord's own colours, so it demonstrates the bot rather than
+     implying an endorsement. */
+  .chat {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.25rem 1.4rem;
+  }
+  .chat + .chat { margin-top: .9rem; }
+  .chat .cmd {
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: .86rem; color: var(--text-3); margin-bottom: .8rem;
+  }
+  .chat .cmd b { color: var(--text-2); font-weight: 500; }
+  .chat .line { font-size: .92rem; line-height: 1.75; }
+  .chat .line .date {
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: .8rem; color: var(--text-3); margin-right: .4rem;
+  }
+  .chat .line .up { color: var(--green); }
+  .chat .line .down { color: var(--red); }
+  .chat .owed {
+    margin-top: .9rem; padding-top: .8rem; border-top: 1px solid var(--border);
+    font-weight: 500;
+  }
+  .chat .only-you {
+    margin-top: .9rem; font-size: .8rem; color: var(--text-3);
+  }
+  .chat .btns { display: flex; gap: .5rem; margin-top: .9rem; }
+  .chat .btns span {
+    font-size: .82rem; padding: .4rem .9rem; border-radius: var(--radius-sm);
+  }
+  .chat .btns .yes { background: var(--green-bg); color: var(--green); }
+  .chat .btns .no  { background: var(--card-2); color: var(--text-3);
+                     border: 1px solid var(--border); }
