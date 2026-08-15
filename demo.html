@@ -1,0 +1,1950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Isola — demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    color-scheme: dark light;
+    --bg:        #0E0E0E;
+    --card:      #1A1A1A;
+    --card-2:    #151515;
+    --border:    rgba(255,255,255,.08);
+    --border-2:  rgba(255,255,255,.14);
+    --text:      #FFFFFF;
+    --text-2:    #A3A3A3;
+    --text-3:    #6E6E6E;
+    --amber-bg:  #3A2708;  --amber:  #F5A524;
+    --green-bg:  #0E2B1D;  --green:  #4ADE80;
+    --red-bg:    #2E1414;  --red:    #F87171;
+    --radius:    14px;
+    --radius-sm: 10px;
+  }
+  /* Light palette. Applied when the system asks for it and nothing has
+     been chosen, or when it has been chosen explicitly. Kept in one place
+     so the two paths can never drift apart. */
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme]) {
+      color-scheme: light;
+      --bg:#F2F2F0; --card:#FFFFFF; --card-2:#FAFAF9;
+      --border:rgba(0,0,0,.08); --border-2:rgba(0,0,0,.14);
+      --text:#0C0C0C; --text-2:#5F5F5C; --text-3:#84847F;
+      --amber-bg:#FDF0D5; --amber:#8A5A06;
+      --green-bg:#DDF3E5; --green:#12692F;
+      --red-bg:#FBE6E4;   --red:#B03225;
+    }
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --bg:#F2F2F0; --card:#FFFFFF; --card-2:#FAFAF9;
+    --border:rgba(0,0,0,.08); --border-2:rgba(0,0,0,.14);
+    --text:#0C0C0C; --text-2:#5F5F5C; --text-3:#84847F;
+    --amber-bg:#FDF0D5; --amber:#8A5A06;
+    --green-bg:#DDF3E5; --green:#12692F;
+    --red-bg:#FBE6E4;   --red:#B03225;
+  }
+  :root[data-theme="dark"] { color-scheme: dark; }
+
+  .theme-toggle { display: inline-flex; gap: 2px; padding: 2px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 999px; }
+  .theme-toggle button {
+    padding: .2rem .55rem; font-size: .72rem; line-height: 1.4;
+    border: none; border-radius: 999px; background: transparent; color: var(--text-3);
+  }
+  .theme-toggle button:hover { background: var(--card-2); color: var(--text-2); }
+  .theme-toggle button[aria-pressed="true"] { background: var(--text); color: var(--bg); }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 15px; line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 48rem; margin: 0 auto; padding: 1.75rem 1.1rem 5rem; }
+
+  .demo-bar {
+    background: var(--card); color: var(--text-2); border-bottom: 1px solid var(--border);
+    font-size: .78rem; padding: .55rem 1.1rem; text-align: center;
+  }
+  .demo-bar b { font-weight: 500; color: var(--text); }
+
+  .masthead {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 1rem; flex-wrap: wrap; margin-bottom: 1.75rem;
+  }
+  .wordmark { font-size: 1.05rem; font-weight: 600; margin: 0; letter-spacing: -.01em; }
+  .masthead-meta { font-size: .8rem; color: var(--text-3); }
+  .masthead-meta a { color: var(--text-2); text-decoration: none; }
+  .masthead-meta a:hover { color: var(--text); }
+
+  h2 { font-size: 1.65rem; font-weight: 600; margin: 0; letter-spacing: -.02em; }
+  h3 { font-size: 1rem; font-weight: 600; margin: 0 0 1rem; letter-spacing: -.01em; }
+  p { margin: 0 0 .9rem; }
+  .lede { color: var(--text-2); max-width: 38rem; }
+  .hint { font-size: .82rem; color: var(--text-3); }
+  .num { font-variant-numeric: tabular-nums; }
+  .neg { color: var(--red); } .pos { color: var(--green); }
+
+  /* Cards ---------------------------------------------------------- */
+
+  .sheet {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.35rem 1.4rem;
+  }
+  .stack > * + * { margin-top: 1.1rem; }
+
+  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: .8rem; }
+  .metric {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.15rem 1.25rem;
+  }
+  .metric .label { font-size: .88rem; color: var(--text-2); margin-bottom: .35rem; }
+  .metric .value { font-size: 1.85rem; font-weight: 600; letter-spacing: -.03em;
+                   font-variant-numeric: tabular-nums; line-height: 1.15; }
+  .metric .value.muted { color: var(--text-3); }
+
+  /* Tables --------------------------------------------------------- */
+
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    text-align: left; font-size: .82rem; font-weight: 400; color: var(--text-3);
+    padding-bottom: .7rem; border-bottom: 1px solid var(--border);
+  }
+  td { padding: .8rem 0; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  .r { text-align: right; }
+  .role { display: block; font-size: .82rem; color: var(--text-3); margin-top: .1rem; }
+  .kv td { padding: .55rem 0; }
+
+  .total-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    border-top: 1px solid var(--border-2); margin-top: .3rem; padding-top: .85rem;
+  }
+  .total-row .k { font-weight: 500; }
+  .total-row .v { font-weight: 600; font-variant-numeric: tabular-nums; font-size: 1.05rem; }
+
+  /* Pills ---------------------------------------------------------- */
+
+  .stamp {
+    display: inline-block; font-size: .78rem; font-weight: 500;
+    padding: .3rem .8rem; border-radius: 999px; white-space: nowrap;
+  }
+  .stamp--draft       { background: var(--card-2); color: var(--text-3); border: 1px solid var(--border); }
+  .stamp--locked      { background: var(--green-bg); color: var(--green); }
+  .stamp--provisional { background: var(--amber-bg); color: var(--amber); }
+  .stamp--final       { background: var(--green-bg); color: var(--green); }
+
+  /* Controls ------------------------------------------------------- */
+
+  button {
+    font-family: inherit; font-size: .88rem; font-weight: 500;
+    padding: .55rem 1.05rem; border-radius: var(--radius-sm);
+    border: 1px solid var(--border-2); background: transparent; color: var(--text);
+    cursor: pointer; transition: background .12s, border-color .12s;
+  }
+  button:hover { background: var(--card-2); border-color: var(--text-3); }
+  button.primary { background: var(--text); color: var(--bg); border-color: var(--text); }
+  button.primary:hover { opacity: .88; }
+  button.quiet { color: var(--text-2); }
+  button:focus-visible, input:focus-visible {
+    outline: 2px solid var(--text-2); outline-offset: 2px;
+  }
+
+  input {
+    font-family: inherit; font-size: .9rem; padding: .58rem .75rem; width: 100%;
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    background: var(--card-2); color: var(--text);
+  }
+  input::placeholder { color: var(--text-3); }
+  input.num-input { text-align: right; font-variant-numeric: tabular-nums; }
+  label { display: block; font-size: .82rem; color: var(--text-2); margin-bottom: .35rem; }
+  .row { display: flex; gap: .7rem; flex-wrap: wrap; align-items: flex-end; }
+  .row > * { flex: 1; min-width: 8rem; }
+  .actions { display: flex; gap: .55rem; flex-wrap: wrap; margin-top: 1.1rem; }
+
+  .error, .notice {
+    border-radius: var(--radius-sm); padding: .7rem .95rem;
+    font-size: .87rem; margin-bottom: 1rem;
+  }
+  .error  { background: var(--red-bg);   color: var(--red); }
+  .notice { background: var(--amber-bg); color: var(--amber); }
+
+  /* Period index --------------------------------------------------- */
+
+  .period-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    width: 100%; text-align: left; padding: .95rem 0; font-size: 1rem;
+    background: none; border: none; border-bottom: 1px solid var(--border);
+    border-radius: 0; color: var(--text);
+  }
+  .period-row:last-of-type { border-bottom: none; }
+  .period-row:hover { background: var(--card-2); border-color: var(--border); }
+  .period-label { font-size: 1.05rem; font-weight: 500; }
+
+  .signatures { display: flex; flex-wrap: wrap; gap: .45rem .9rem; margin-top: .9rem; }
+  .signature {
+    font-size: .8rem; color: var(--green); background: var(--green-bg);
+    padding: .25rem .7rem; border-radius: 999px;
+  }
+
+  .trail { list-style: none; padding: 0; margin: 0; }
+  .trail li {
+    display: flex; gap: .9rem; padding: .55rem 0; font-size: .86rem;
+    border-bottom: 1px solid var(--border); color: var(--text-2);
+  }
+  .trail li:last-child { border-bottom: none; }
+  .trail time { font-size: .8rem; color: var(--text-3); white-space: nowrap; min-width: 5.5rem; }
+
+  .whoami {
+    display: flex; gap: .4rem; flex-wrap: wrap; align-items: center;
+    margin-bottom: 1.25rem; font-size: .82rem; color: var(--text-3);
+  }
+  .whoami button { padding: .3rem .7rem; font-size: .8rem; color: var(--text-2); }
+  .whoami button[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  @media (max-width: 34rem) {
+    .wrap { padding: 1.25rem .9rem 3.5rem; }
+    .metric .value { font-size: 1.55rem; }
+    h2 { font-size: 1.4rem; }
+  }
+
+  .tabs { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: 1.5rem;
+          border-bottom: 1px solid var(--border); padding-bottom: .8rem; }
+  .tab { padding: .4rem .85rem; font-size: .85rem; border-radius: 999px;
+         border: 1px solid transparent; background: transparent; color: var(--text-2); }
+  .tab:hover { background: var(--card); border-color: var(--border); }
+  .tab[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
+  code { font-family: ui-monospace, monospace; font-size: .85em;
+         background: var(--card-2); padding: .1rem .35rem; border-radius: 5px; }
+  textarea:focus-visible { outline: 2px solid var(--text-2); outline-offset: 2px; }
+</style>
+<script>
+(function(){
+  try{
+    var saved=localStorage.getItem('isola-theme');
+    if(saved==='light'||saved==='dark')document.documentElement.setAttribute('data-theme',saved);
+  }catch(e){}
+})();
+</script>
+<script>
+/* Translations. Model-generated: good enough to demonstrate the system,
+   not good enough to ship. Have a native speaker review before launch,
+   especially the tax and billing strings. */
+const LOCALES={
+  en: { label: 'English', intl: 'en-GB' },
+  es: { label: 'Español', intl: 'es-ES' },
+  ptBR: { label: 'Português (BR)', intl: 'pt-BR' },
+  fr: { label: 'Français', intl: 'fr-FR' },
+  de: { label: 'Deutsch', intl: 'de-DE' },
+  ja: { label: '日本語', intl: 'ja-JP' },
+};
+const STRINGS={
+  en: {
+    'nav.islands': 'Islands',
+    'nav.account': 'Account',
+    'nav.periods': 'Periods',
+    'nav.bank': 'Bank',
+    'nav.pnl': 'P&L',
+    'nav.people': 'People',
+    'nav.billing': 'Billing',
+    'nav.discord': 'Discord',
+
+    'common.viewingAs': 'Viewing as',
+    'common.owner': 'owner',
+    'common.contributor': 'contributor',
+    'common.contributorCol': 'Contributor',
+    'common.share': 'Share',
+    'common.gross': 'Gross',
+    'common.net': 'Net',
+    'common.total': 'Total',
+    'common.amount': 'Amount',
+    'common.balance': 'Balance',
+    'common.date': 'Date',
+    'common.period': 'Period',
+    'common.island': 'Island',
+    'common.expenses': 'Expenses',
+    'common.download': 'Download',
+    'common.cancel': 'Cancel',
+    'common.none': 'None',
+
+    'islands.title': 'Islands',
+    'islands.subtitle': 'Splits belong to an island, because collaborators differ on each',
+    'islands.window': 'Window',
+    'islands.openEnded': 'open ended',
+    'islands.notOn': 'Not on this island',
+    'islands.add': 'Add an island',
+    'islands.name': 'Name',
+    'islands.code': 'Island code',
+    'islands.effective': 'Effective splits by period',
+    'islands.asWritten': 'as written',
+
+    'account.title': 'Statement of account',
+    'account.owedToYou': 'Owed to you',
+    'account.paidToYou': 'Paid to you',
+    'account.openAdvances': 'Open advances',
+    'account.movement': 'Movement',
+    'account.owedNow': 'Owed to you now',
+    'account.download': 'Download statement of account',
+    'account.empty': 'Nothing on your account yet.',
+    'account.owedToContributors': 'Owed to contributors',
+    'account.settled': 'Everyone is settled up.',
+    'account.lastPaid': 'Last paid',
+    'account.recordPayment': 'Record payment',
+    'account.totalOutstanding': 'Total outstanding',
+    'account.notMoving': 'Send the money through your own bank, then record it here. This ledger keeps the record; it does not move funds.',
+
+    'entry.credit_provisional': 'Provisional credit',
+    'entry.credit_reversal': 'Estimate reversed',
+    'entry.credit_final': 'Final credit',
+    'entry.payment': 'Payment received',
+    'entry.manual': 'Correction',
+
+    'periods.title': 'Periods',
+    'periods.draft': 'draft',
+    'periods.locked': 'locked',
+    'periods.provisional': 'provisional',
+    'periods.final': 'final',
+    'periods.lock': 'Lock this period',
+    'periods.postProvisional': 'Post provisional figures',
+    'periods.postFinal': 'Post final figures',
+    'periods.useExample': 'Use example figures',
+    'periods.byIsland': 'By island',
+    'periods.distributable': 'Distributable',
+    'periods.distributableAcross': 'Distributable across islands',
+    'periods.revision': 'Revision',
+    'periods.grossPayout': 'Gross payout',
+    'periods.revenueStreams': 'Revenue streams',
+    'periods.allPeriods': 'All periods',
+    'periods.onlyEngagement': 'Only the engagement payout is expected to move between estimate and final. Anything marked fixed changing is flagged as a probable keying error.',
+    'periods.fixed': 'fixed',
+
+    'stream.engagement': 'Engagement payout',
+    'stream.in_island': 'In-island transactions',
+    'stream.sac': 'Support-a-Creator',
+    'stream.sponsored': 'Sponsored row',
+
+    'billing.title': 'Billing',
+    'billing.subtitle': 'Priced on volume, not per contributor',
+    'billing.trailingAverage': 'Trailing average',
+    'billing.currentPlan': 'Current plan',
+    'billing.monthlyCost': 'Monthly cost',
+    'billing.plans': 'Plans',
+    'billing.upTo': 'Up to',
+    'billing.price': 'Price',
+    'billing.noLimit': 'no limit',
+    'billing.free': 'Free',
+    'billing.current': 'current',
+    'billing.choose': 'Choose',
+    'billing.neverGated': 'What is never gated',
+    'billing.alwaysFree': 'always free',
+    'billing.readOwn': 'Reading your own statement of account',
+    'billing.exportOwn': 'Exporting it as CSV',
+    'billing.everyContributor': 'Every contributor gets an account',
+    'billing.postFigures': 'Posting new figures',
+    'billing.needsBand': 'needs the right band',
+
+    'bank.title': 'Bank reconciliation',
+    'bank.subtitle': 'What you recorded, against what actually left the account',
+    'bank.lines': 'Bank lines',
+    'bank.matched': 'Matched',
+    'bank.unexplained': 'Unexplained',
+    'bank.imported': 'Imported statement',
+    'bank.matchedTo': 'Matched to',
+    'bank.unmatched': 'unmatched',
+    'bank.rerun': 'Re-run matching',
+    'bank.inBankNotRecorded': 'In the bank but not recorded',
+    'bank.recordedNotInBank': 'Recorded but not in the bank',
+    'bank.ownerOnly': 'Only the team owner can see bank data.',
+
+    'pnl.title': 'Profit and loss',
+    'pnl.subtitle': 'Final periods only',
+    'pnl.revenue': 'Revenue',
+    'pnl.net': 'Net',
+    'pnl.byIsland': 'Revenue by island',
+    'pnl.byStream': 'Revenue by stream',
+    'pnl.byCategory': 'Expenses by category',
+    'pnl.ownerOnly': 'Only the team owner can see the team P&L.',
+
+    'people.title': 'People',
+    'people.team': 'Team',
+    'people.role': 'Role',
+    'people.makeOwner': 'Make owner',
+    'people.demote': 'Demote',
+    'people.offboard': 'Offboard',
+    'people.invite': 'Invite a contributor',
+    'people.email': 'Email',
+    'people.createInvite': 'Create invite link',
+    'people.offboardRules': 'Offboarding refuses while someone is owed money, has been overpaid, or holds an open-ended share on any island.',
+
+    'theme.system': 'Auto',
+    'discord.step1': "Create an application",
+    'discord.step2': "Set the environment variables",
+    'discord.step3': "Point the interactions URL",
+    'discord.step4': "Register the commands",
+    'islands.from': "from {a}",
+    'islands.until': "until {a}",
+    'islands.fromTo': "from {a} to {b}",
+    'islands.sunsetNote': "A share can end. Expiry resolves at read time, so the agreement above stays readable years later.",
+    'account.creditedPaid': "Credited {credited} · paid {paid}. Provisional credits are reversed when Epic posts the final figure.",
+    'periods.lockNote': "Locking pins each island’s split to this period and freezes it.",
+    'periods.lockedNote': "Locked. Enter Epic’s provisional figures from the Monetization Payout tab, per island.",
+    'periods.ownerLocks': "The team owner locks the period.",
+    'periods.provisionalNote': "Provisional. Credits are booked now and reversed when Epic posts the final figure.",
+    'periods.finalNote': "Final. Epic revised the total by {delta}. Provisional credits were reversed and the settled figures booked.",
+    'expenses.none': "No expenses recorded.",
+    'expenses.deducted': "Deducted from that island before it is split.",
+    'expenses.what': "What for",
+    'bank.moneyLeft': "Money left the account with no matching entry — usually a business expense that should be recorded.",
+    'pnl.noFinal': "No finalised periods yet.",
+    'people.inviteNote': "The invitee sets their own password.",
+    'people.inviteLink': "Send them this link. Expires in 7 days, works once.",
+    'billing.onlyFinal': "Only final figures count. Billing on an estimate that later falls would charge a team for money they never received.",
+    'billing.neverGatedNote': "Contributors did not choose the plan, and a bookkeeping product that locks people out of their own records over an invoice has stopped being worth trusting.",
+    'billing.contributorNote': "The owner needs to upgrade before new figures can be posted. Your existing statement is unaffected.",
+    'billing.nothingToDo': "Nothing to do. Your statement of account and its export are free forever, on every plan.",
+    'discord.subtitle': "Approvals and balances where the team already is",
+    'discord.ephemeral': "Replies are ephemeral, so only the person who ran the command sees their figures.",
+    'discord.httpNote': "HTTP interactions, not a gateway connection. Every request is Ed25519 verified before it is parsed.",
+    'discord.setup': "Setup",
+    'discord.owedToYou': "Owed to you:",
+    'common.expensesFor': "What for",
+    'theme.light': 'Light',
+    'theme.dark': 'Dark',
+  },
+  es: {
+  'nav.islands': 'Islas', 'nav.account': 'Cuenta', 'nav.periods': 'Periodos',
+  'nav.bank': 'Banco', 'nav.pnl': 'Resultados', 'nav.people': 'Personas',
+  'nav.billing': 'Facturación', 'nav.discord': 'Discord',
+  'common.viewingAs': 'Viendo como', 'common.owner': 'propietario',
+  'common.contributor': 'colaborador', 'common.contributorCol': 'Colaborador',
+  'common.share': 'Parte', 'common.gross': 'Bruto', 'common.net': 'Neto',
+  'common.total': 'Total', 'common.amount': 'Importe', 'common.balance': 'Saldo',
+  'common.date': 'Fecha', 'common.period': 'Periodo', 'common.island': 'Isla',
+  'common.expenses': 'Gastos', 'common.download': 'Descargar',
+  'common.cancel': 'Cancelar', 'common.none': 'Ninguno',
+  'islands.title': 'Islas',
+  'islands.subtitle': 'Los repartos pertenecen a cada isla, porque los colaboradores cambian en cada una',
+  'islands.window': 'Vigencia', 'islands.openEnded': 'sin fin',
+  'islands.notOn': 'No participa en esta isla', 'islands.add': 'Añadir una isla',
+  'islands.name': 'Nombre', 'islands.code': 'Código de isla',
+  'islands.effective': 'Reparto efectivo por periodo', 'islands.asWritten': 'según lo acordado',
+  'account.title': 'Estado de cuenta', 'account.owedToYou': 'Te deben',
+  'account.paidToYou': 'Te han pagado', 'account.openAdvances': 'Anticipos pendientes',
+  'account.movement': 'Movimiento', 'account.owedNow': 'Te deben ahora',
+  'account.download': 'Descargar estado de cuenta',
+  'account.empty': 'Todavía no hay movimientos en tu cuenta.',
+  'account.owedToContributors': 'Pendiente con los colaboradores',
+  'account.settled': 'Todo está saldado.', 'account.lastPaid': 'Último pago',
+  'account.recordPayment': 'Registrar pago', 'account.totalOutstanding': 'Total pendiente',
+  'account.notMoving': 'Envía el dinero desde tu propio banco y regístralo aquí. Este libro guarda el registro; no mueve fondos.',
+  'entry.credit_provisional': 'Abono provisional', 'entry.credit_reversal': 'Estimación revertida',
+  'entry.credit_final': 'Abono definitivo', 'entry.payment': 'Pago recibido',
+  'entry.manual': 'Corrección',
+  'periods.title': 'Periodos', 'periods.draft': 'borrador', 'periods.locked': 'bloqueado',
+  'periods.provisional': 'provisional', 'periods.final': 'definitivo',
+  'periods.lock': 'Bloquear este periodo', 'periods.postProvisional': 'Publicar cifras provisionales',
+  'periods.postFinal': 'Publicar cifras definitivas', 'periods.useExample': 'Usar cifras de ejemplo',
+  'periods.byIsland': 'Por isla', 'periods.distributable': 'Repartible',
+  'periods.distributableAcross': 'Repartible entre islas', 'periods.revision': 'Revisión',
+  'periods.grossPayout': 'Pago bruto', 'periods.revenueStreams': 'Fuentes de ingresos',
+  'periods.allPeriods': 'Todos los periodos',
+  'periods.onlyEngagement': 'Solo el pago por interacción debería cambiar entre la estimación y la cifra definitiva. Cualquier cambio en las fuentes fijas se señala como probable error de captura.',
+  'periods.fixed': 'fija',
+  'stream.engagement': 'Pago por interacción', 'stream.in_island': 'Compras dentro de la isla',
+  'stream.sac': 'Support-a-Creator', 'stream.sponsored': 'Fila patrocinada',
+  'billing.title': 'Facturación', 'billing.subtitle': 'Precio por volumen, no por colaborador',
+  'billing.trailingAverage': 'Media móvil', 'billing.currentPlan': 'Plan actual',
+  'billing.monthlyCost': 'Coste mensual', 'billing.plans': 'Planes', 'billing.upTo': 'Hasta',
+  'billing.price': 'Precio', 'billing.noLimit': 'sin límite', 'billing.free': 'Gratis',
+  'billing.current': 'actual', 'billing.choose': 'Elegir',
+  'billing.neverGated': 'Lo que nunca se bloquea', 'billing.alwaysFree': 'siempre gratis',
+  'billing.readOwn': 'Consultar tu propio estado de cuenta', 'billing.exportOwn': 'Exportarlo en CSV',
+  'billing.everyContributor': 'Cada colaborador tiene su cuenta',
+  'billing.postFigures': 'Publicar cifras nuevas', 'billing.needsBand': 'requiere el plan adecuado',
+  'bank.title': 'Conciliación bancaria',
+  'bank.subtitle': 'Lo que registraste, frente a lo que salió realmente de la cuenta',
+  'bank.lines': 'Movimientos', 'bank.matched': 'Conciliados', 'bank.unexplained': 'Sin explicar',
+  'bank.imported': 'Extracto importado', 'bank.matchedTo': 'Conciliado con',
+  'bank.unmatched': 'sin conciliar', 'bank.rerun': 'Volver a conciliar',
+  'bank.inBankNotRecorded': 'En el banco pero sin registrar',
+  'bank.recordedNotInBank': 'Registrado pero no en el banco',
+  'bank.ownerOnly': 'Solo el propietario puede ver los datos bancarios.',
+  'pnl.title': 'Pérdidas y ganancias', 'pnl.subtitle': 'Solo periodos definitivos',
+  'pnl.revenue': 'Ingresos', 'pnl.net': 'Neto', 'pnl.byIsland': 'Ingresos por isla',
+  'pnl.byStream': 'Ingresos por fuente', 'pnl.byCategory': 'Gastos por categoría',
+  'pnl.ownerOnly': 'Solo el propietario puede ver las cuentas del equipo.',
+  'people.title': 'Personas', 'people.team': 'Equipo', 'people.role': 'Rol',
+  'people.makeOwner': 'Hacer propietario', 'people.demote': 'Quitar propiedad',
+  'people.offboard': 'Dar de baja', 'people.invite': 'Invitar a un colaborador',
+  'people.email': 'Correo', 'people.createInvite': 'Crear enlace de invitación',
+  'people.offboardRules': 'No se puede dar de baja a alguien con saldo pendiente, pagado de más, o con una parte sin fecha de fin en alguna isla.',
+  'theme.system': 'Auto', 'theme.light': 'Claro', 'theme.dark': 'Oscuro',
+  'discord.step1': "Crea una aplicación",
+  'discord.step2': "Configura las variables de entorno",
+  'discord.step3': "Apunta la URL de interacciones",
+  'discord.step4': "Registra los comandos",
+  'islands.from': "desde {a}",
+  'islands.until': "hasta {a}",
+  'islands.fromTo': "de {a} a {b}",
+  'islands.sunsetNote': "Una parte puede terminar. La expiración se resuelve al consultarla, así el acuerdo de arriba sigue siendo legible años después.",
+  'account.creditedPaid': "Abonado {credited} · pagado {paid}. Los abonos provisionales se revierten cuando Epic publica la cifra definitiva.",
+  'periods.lockNote': "Bloquear fija el reparto de cada isla a este periodo y lo congela.",
+  'periods.lockedNote': "Bloqueado. Introduce las cifras provisionales de Epic desde la pestaña Monetization Payout, por isla.",
+  'periods.ownerLocks': "El propietario del equipo bloquea el periodo.",
+  'periods.provisionalNote': "Provisional. Los abonos se registran ahora y se revierten cuando Epic publica la cifra definitiva.",
+  'periods.finalNote': "Definitivo. Epic revisó el total en {delta}. Los abonos provisionales se revirtieron y se registraron las cifras liquidadas.",
+  'expenses.none': "No hay gastos registrados.",
+  'expenses.deducted': "Se deduce de esa isla antes de repartir.",
+  'expenses.what': "Concepto",
+  'bank.moneyLeft': "Salió dinero de la cuenta sin un movimiento correspondiente; suele ser un gasto que debería registrarse.",
+  'pnl.noFinal': "Todavía no hay periodos definitivos.",
+  'people.inviteNote': "La persona invitada elige su propia contraseña.",
+  'people.inviteLink': "Envíale este enlace. Caduca en 7 días y sirve una sola vez.",
+  'billing.onlyFinal': "Solo cuentan las cifras definitivas. Facturar sobre una estimación que luego baja cobraría por dinero nunca recibido.",
+  'billing.neverGatedNote': "Los colaboradores no eligieron el plan, y un sistema contable que bloquea el acceso a los propios registros por una factura deja de ser fiable.",
+  'billing.contributorNote': "El propietario debe cambiar de plan antes de registrar cifras nuevas. Tu estado de cuenta actual no se ve afectado.",
+  'billing.nothingToDo': "Nada que hacer. Tu estado de cuenta y su exportación son gratis para siempre, en cualquier plan.",
+  'discord.subtitle': "Aprobaciones y saldos donde el equipo ya está",
+  'discord.ephemeral': "Las respuestas son efímeras: solo quien ejecuta el comando ve sus cifras.",
+  'discord.httpNote': "Interacciones HTTP, no una conexión de gateway. Cada petición se verifica con Ed25519 antes de analizarla.",
+  'discord.setup': "Configuración",
+  'discord.owedToYou': "Te deben:",
+  'common.expensesFor': "Concepto",
+},
+  ptBR: {
+  'nav.islands': 'Ilhas', 'nav.account': 'Conta', 'nav.periods': 'Períodos',
+  'nav.bank': 'Banco', 'nav.pnl': 'Resultados', 'nav.people': 'Pessoas',
+  'nav.billing': 'Cobrança', 'nav.discord': 'Discord',
+  'common.viewingAs': 'Vendo como', 'common.owner': 'proprietário',
+  'common.contributor': 'colaborador', 'common.contributorCol': 'Colaborador',
+  'common.share': 'Parte', 'common.gross': 'Bruto', 'common.net': 'Líquido',
+  'common.total': 'Total', 'common.amount': 'Valor', 'common.balance': 'Saldo',
+  'common.date': 'Data', 'common.period': 'Período', 'common.island': 'Ilha',
+  'common.expenses': 'Despesas', 'common.download': 'Baixar',
+  'common.cancel': 'Cancelar', 'common.none': 'Nenhum',
+  'islands.title': 'Ilhas',
+  'islands.subtitle': 'As divisões pertencem a cada ilha, porque os colaboradores mudam em cada uma',
+  'islands.window': 'Vigência', 'islands.openEnded': 'sem prazo',
+  'islands.notOn': 'Não participa desta ilha', 'islands.add': 'Adicionar uma ilha',
+  'islands.name': 'Nome', 'islands.code': 'Código da ilha',
+  'islands.effective': 'Divisão efetiva por período', 'islands.asWritten': 'conforme acordado',
+  'account.title': 'Extrato da conta', 'account.owedToYou': 'Devido a você',
+  'account.paidToYou': 'Pago a você', 'account.openAdvances': 'Adiantamentos em aberto',
+  'account.movement': 'Movimento', 'account.owedNow': 'Devido a você agora',
+  'account.download': 'Baixar extrato da conta',
+  'account.empty': 'Ainda não há movimentos na sua conta.',
+  'account.owedToContributors': 'Devido aos colaboradores',
+  'account.settled': 'Está tudo acertado.', 'account.lastPaid': 'Último pagamento',
+  'account.recordPayment': 'Registrar pagamento', 'account.totalOutstanding': 'Total em aberto',
+  'account.notMoving': 'Envie o dinheiro pelo seu próprio banco e registre aqui. Este livro guarda o registro; ele não movimenta fundos.',
+  'entry.credit_provisional': 'Crédito provisório', 'entry.credit_reversal': 'Estimativa estornada',
+  'entry.credit_final': 'Crédito final', 'entry.payment': 'Pagamento recebido',
+  'entry.manual': 'Correção',
+  'periods.title': 'Períodos', 'periods.draft': 'rascunho', 'periods.locked': 'bloqueado',
+  'periods.provisional': 'provisório', 'periods.final': 'final',
+  'periods.lock': 'Bloquear este período', 'periods.postProvisional': 'Lançar valores provisórios',
+  'periods.postFinal': 'Lançar valores finais', 'periods.useExample': 'Usar valores de exemplo',
+  'periods.byIsland': 'Por ilha', 'periods.distributable': 'Distribuível',
+  'periods.distributableAcross': 'Distribuível entre ilhas', 'periods.revision': 'Revisão',
+  'periods.grossPayout': 'Pagamento bruto', 'periods.revenueStreams': 'Fontes de receita',
+  'periods.allPeriods': 'Todos os períodos',
+  'periods.onlyEngagement': 'Apenas o pagamento por engajamento deve mudar entre a estimativa e o valor final. Qualquer mudança nas fontes fixas é sinalizada como provável erro de digitação.',
+  'periods.fixed': 'fixa',
+  'stream.engagement': 'Pagamento por engajamento', 'stream.in_island': 'Compras dentro da ilha',
+  'stream.sac': 'Support-a-Creator', 'stream.sponsored': 'Fila patrocinada',
+  'billing.title': 'Cobrança', 'billing.subtitle': 'Preço por volume, não por colaborador',
+  'billing.trailingAverage': 'Média móvel', 'billing.currentPlan': 'Plano atual',
+  'billing.monthlyCost': 'Custo mensal', 'billing.plans': 'Planos', 'billing.upTo': 'Até',
+  'billing.price': 'Preço', 'billing.noLimit': 'sem limite', 'billing.free': 'Grátis',
+  'billing.current': 'atual', 'billing.choose': 'Escolher',
+  'billing.neverGated': 'O que nunca é bloqueado', 'billing.alwaysFree': 'sempre grátis',
+  'billing.readOwn': 'Ver seu próprio extrato', 'billing.exportOwn': 'Exportá-lo em CSV',
+  'billing.everyContributor': 'Todo colaborador tem uma conta',
+  'billing.postFigures': 'Lançar novos valores', 'billing.needsBand': 'exige o plano certo',
+  'bank.title': 'Conciliação bancária',
+  'bank.subtitle': 'O que você registrou, contra o que realmente saiu da conta',
+  'bank.lines': 'Lançamentos', 'bank.matched': 'Conciliados', 'bank.unexplained': 'Sem explicação',
+  'bank.imported': 'Extrato importado', 'bank.matchedTo': 'Conciliado com',
+  'bank.unmatched': 'não conciliado', 'bank.rerun': 'Conciliar novamente',
+  'bank.inBankNotRecorded': 'No banco mas não registrado',
+  'bank.recordedNotInBank': 'Registrado mas não no banco',
+  'bank.ownerOnly': 'Apenas o proprietário pode ver os dados bancários.',
+  'pnl.title': 'Lucros e perdas', 'pnl.subtitle': 'Apenas períodos finais',
+  'pnl.revenue': 'Receita', 'pnl.net': 'Líquido', 'pnl.byIsland': 'Receita por ilha',
+  'pnl.byStream': 'Receita por fonte', 'pnl.byCategory': 'Despesas por categoria',
+  'pnl.ownerOnly': 'Apenas o proprietário pode ver as contas da equipe.',
+  'people.title': 'Pessoas', 'people.team': 'Equipe', 'people.role': 'Função',
+  'people.makeOwner': 'Tornar proprietário', 'people.demote': 'Remover propriedade',
+  'people.offboard': 'Desligar', 'people.invite': 'Convidar um colaborador',
+  'people.email': 'E-mail', 'people.createInvite': 'Criar link de convite',
+  'people.offboardRules': 'Não é possível desligar alguém com saldo devido, pago a mais, ou com uma parte sem prazo em alguma ilha.',
+  'theme.system': 'Auto', 'theme.light': 'Claro', 'theme.dark': 'Escuro',
+  'discord.step1': "Crie um aplicativo",
+  'discord.step2': "Defina as variáveis de ambiente",
+  'discord.step3': "Aponte a URL de interações",
+  'discord.step4': "Registre os comandos",
+  'islands.from': "a partir de {a}",
+  'islands.until': "até {a}",
+  'islands.fromTo': "de {a} a {b}",
+  'islands.sunsetNote': "Uma parte pode terminar. A expiração é resolvida na leitura, então o acordo acima continua legível anos depois.",
+  'account.creditedPaid': "Creditado {credited} · pago {paid}. Os créditos provisórios são estornados quando a Epic publica o valor final.",
+  'periods.lockNote': "Bloquear fixa a divisão de cada ilha neste período e a congela.",
+  'periods.lockedNote': "Bloqueado. Insira os valores provisórios da Epic na aba Monetization Payout, por ilha.",
+  'periods.ownerLocks': "O proprietário da equipe bloqueia o período.",
+  'periods.provisionalNote': "Provisório. Os créditos são lançados agora e estornados quando a Epic publica o valor final.",
+  'periods.finalNote': "Final. A Epic revisou o total em {delta}. Os créditos provisórios foram estornados e os valores liquidados lançados.",
+  'expenses.none': "Nenhuma despesa registrada.",
+  'expenses.deducted': "Deduzido daquela ilha antes da divisão.",
+  'expenses.what': "Finalidade",
+  'bank.moneyLeft': "Saiu dinheiro da conta sem lançamento correspondente; normalmente é uma despesa que deveria ser registrada.",
+  'pnl.noFinal': "Ainda não há períodos finais.",
+  'people.inviteNote': "A pessoa convidada define a própria senha.",
+  'people.inviteLink': "Envie este link. Expira em 7 dias e funciona uma vez.",
+  'billing.onlyFinal': "Somente valores finais contam. Cobrar sobre uma estimativa que depois cai cobraria por dinheiro nunca recebido.",
+  'billing.neverGatedNote': "Os colaboradores não escolheram o plano, e um sistema contábil que bloqueia o acesso aos próprios registros por causa de uma fatura deixa de ser confiável.",
+  'billing.contributorNote': "O proprietário precisa mudar de plano antes de lançar novos valores. Seu extrato atual não é afetado.",
+  'billing.nothingToDo': "Nada a fazer. Seu extrato e a exportação são gratuitos para sempre, em qualquer plano.",
+  'discord.subtitle': "Aprovações e saldos onde a equipe já está",
+  'discord.ephemeral': "As respostas são efêmeras: só quem executa o comando vê seus valores.",
+  'discord.httpNote': "Interações HTTP, não uma conexão de gateway. Cada requisição é verificada com Ed25519 antes de ser processada.",
+  'discord.setup': "Configuração",
+  'discord.owedToYou': "Devido a você:",
+  'common.expensesFor': "Finalidade",
+},
+  fr: {
+  'nav.islands': 'Îles', 'nav.account': 'Compte', 'nav.periods': 'Périodes',
+  'nav.bank': 'Banque', 'nav.pnl': 'Résultat', 'nav.people': 'Personnes',
+  'nav.billing': 'Facturation', 'nav.discord': 'Discord',
+  'common.viewingAs': 'Vu en tant que', 'common.owner': 'propriétaire',
+  'common.contributor': 'collaborateur', 'common.contributorCol': 'Collaborateur',
+  'common.share': 'Part', 'common.gross': 'Brut', 'common.net': 'Net',
+  'common.total': 'Total', 'common.amount': 'Montant', 'common.balance': 'Solde',
+  'common.date': 'Date', 'common.period': 'Période', 'common.island': 'Île',
+  'common.expenses': 'Dépenses', 'common.download': 'Télécharger',
+  'common.cancel': 'Annuler', 'common.none': 'Aucun',
+  'islands.title': 'Îles',
+  'islands.subtitle': 'Les répartitions appartiennent à une île, car les collaborateurs diffèrent sur chacune',
+  'islands.window': 'Période', 'islands.openEnded': 'sans échéance',
+  'islands.notOn': 'Ne participe pas à cette île', 'islands.add': 'Ajouter une île',
+  'islands.name': 'Nom', 'islands.code': 'Code de l\u2019île',
+  'islands.effective': 'Répartition effective par période', 'islands.asWritten': 'tel que convenu',
+  'account.title': 'Relevé de compte', 'account.owedToYou': 'Vous est dû',
+  'account.paidToYou': 'Vous a été versé', 'account.openAdvances': 'Avances en cours',
+  'account.movement': 'Mouvement', 'account.owedNow': 'Vous est dû actuellement',
+  'account.download': 'Télécharger le relevé de compte',
+  'account.empty': 'Aucun mouvement sur votre compte pour l\u2019instant.',
+  'account.owedToContributors': 'Dû aux collaborateurs',
+  'account.settled': 'Tout est réglé.', 'account.lastPaid': 'Dernier versement',
+  'account.recordPayment': 'Enregistrer un versement', 'account.totalOutstanding': 'Total dû',
+  'account.notMoving': 'Envoyez l\u2019argent depuis votre propre banque, puis enregistrez-le ici. Ce registre conserve la trace ; il ne déplace pas de fonds.',
+  'entry.credit_provisional': 'Crédit provisoire', 'entry.credit_reversal': 'Estimation annulée',
+  'entry.credit_final': 'Crédit définitif', 'entry.payment': 'Versement reçu',
+  'entry.manual': 'Correction',
+  'periods.title': 'Périodes', 'periods.draft': 'brouillon', 'periods.locked': 'verrouillée',
+  'periods.provisional': 'provisoire', 'periods.final': 'définitive',
+  'periods.lock': 'Verrouiller cette période', 'periods.postProvisional': 'Publier les chiffres provisoires',
+  'periods.postFinal': 'Publier les chiffres définitifs', 'periods.useExample': 'Utiliser des chiffres d\u2019exemple',
+  'periods.byIsland': 'Par île', 'periods.distributable': 'Répartissable',
+  'periods.distributableAcross': 'Répartissable entre les îles', 'periods.revision': 'Révision',
+  'periods.grossPayout': 'Versement brut', 'periods.revenueStreams': 'Sources de revenus',
+  'periods.allPeriods': 'Toutes les périodes',
+  'periods.onlyEngagement': 'Seul le paiement à l\u2019engagement est censé varier entre l\u2019estimation et le chiffre définitif. Toute variation des sources fixes est signalée comme probable erreur de saisie.',
+  'periods.fixed': 'fixe',
+  'stream.engagement': 'Paiement à l\u2019engagement', 'stream.in_island': 'Achats sur l\u2019île',
+  'stream.sac': 'Support-a-Creator', 'stream.sponsored': 'Ligne sponsorisée',
+  'billing.title': 'Facturation', 'billing.subtitle': 'Tarifé au volume, pas par collaborateur',
+  'billing.trailingAverage': 'Moyenne glissante', 'billing.currentPlan': 'Formule actuelle',
+  'billing.monthlyCost': 'Coût mensuel', 'billing.plans': 'Formules', 'billing.upTo': 'Jusqu\u2019à',
+  'billing.price': 'Prix', 'billing.noLimit': 'sans limite', 'billing.free': 'Gratuit',
+  'billing.current': 'actuelle', 'billing.choose': 'Choisir',
+  'billing.neverGated': 'Ce qui n\u2019est jamais bloqué', 'billing.alwaysFree': 'toujours gratuit',
+  'billing.readOwn': 'Consulter votre propre relevé', 'billing.exportOwn': 'L\u2019exporter en CSV',
+  'billing.everyContributor': 'Chaque collaborateur a un compte',
+  'billing.postFigures': 'Publier de nouveaux chiffres', 'billing.needsBand': 'nécessite la bonne formule',
+  'bank.title': 'Rapprochement bancaire',
+  'bank.subtitle': 'Ce que vous avez enregistré, face à ce qui a réellement quitté le compte',
+  'bank.lines': 'Écritures', 'bank.matched': 'Rapprochées', 'bank.unexplained': 'Inexpliquées',
+  'bank.imported': 'Relevé importé', 'bank.matchedTo': 'Rapproché avec',
+  'bank.unmatched': 'non rapproché', 'bank.rerun': 'Relancer le rapprochement',
+  'bank.inBankNotRecorded': 'À la banque mais non enregistré',
+  'bank.recordedNotInBank': 'Enregistré mais absent de la banque',
+  'bank.ownerOnly': 'Seul le propriétaire peut voir les données bancaires.',
+  'pnl.title': 'Compte de résultat', 'pnl.subtitle': 'Périodes définitives uniquement',
+  'pnl.revenue': 'Revenus', 'pnl.net': 'Net', 'pnl.byIsland': 'Revenus par île',
+  'pnl.byStream': 'Revenus par source', 'pnl.byCategory': 'Dépenses par catégorie',
+  'pnl.ownerOnly': 'Seul le propriétaire peut voir les comptes de l\u2019équipe.',
+  'people.title': 'Personnes', 'people.team': 'Équipe', 'people.role': 'Rôle',
+  'people.makeOwner': 'Nommer propriétaire', 'people.demote': 'Retirer la propriété',
+  'people.offboard': 'Retirer', 'people.invite': 'Inviter un collaborateur',
+  'people.email': 'E-mail', 'people.createInvite': 'Créer un lien d\u2019invitation',
+  'people.offboardRules': 'Impossible de retirer quelqu\u2019un à qui il reste dû, qui a été trop payé, ou qui détient une part sans échéance sur une île.',
+  'theme.system': 'Auto', 'theme.light': 'Clair', 'theme.dark': 'Sombre',
+  'discord.step1': "Créez une application",
+  'discord.step2': "Définissez les variables d’environnement",
+  'discord.step3': "Pointez l’URL d’interactions",
+  'discord.step4': "Enregistrez les commandes",
+  'islands.from': "à partir de {a}",
+  'islands.until': "jusqu’à {a}",
+  'islands.fromTo': "de {a} à {b}",
+  'islands.sunsetNote': "Une part peut prendre fin. L’expiration est résolue à la lecture, donc l’accord ci-dessus reste lisible des années plus tard.",
+  'account.creditedPaid': "Crédité {credited} · versé {paid}. Les crédits provisoires sont annulés lorsqu’Epic publie le chiffre définitif.",
+  'periods.lockNote': "Le verrouillage fige la répartition de chaque île pour cette période.",
+  'periods.lockedNote': "Verrouillé. Saisissez les chiffres provisoires d’Epic depuis l’onglet Monetization Payout, par île.",
+  'periods.ownerLocks': "Le propriétaire de l’équipe verrouille la période.",
+  'periods.provisionalNote': "Provisoire. Les crédits sont comptabilisés maintenant puis annulés lorsqu’Epic publie le chiffre définitif.",
+  'periods.finalNote': "Définitif. Epic a révisé le total de {delta}. Les crédits provisoires ont été annulés et les chiffres réglés comptabilisés.",
+  'expenses.none': "Aucune dépense enregistrée.",
+  'expenses.deducted': "Déduit de cette île avant la répartition.",
+  'expenses.what': "Objet",
+  'bank.moneyLeft': "De l’argent a quitté le compte sans écriture correspondante ; il s’agit souvent d’une dépense à enregistrer.",
+  'pnl.noFinal': "Aucune période définitive pour l’instant.",
+  'people.inviteNote': "La personne invitée choisit son propre mot de passe.",
+  'people.inviteLink': "Envoyez-lui ce lien. Il expire dans 7 jours et ne sert qu’une fois.",
+  'billing.onlyFinal': "Seuls les chiffres définitifs comptent. Facturer sur une estimation revue à la baisse ferait payer pour de l’argent jamais reçu.",
+  'billing.neverGatedNote': "Les collaborateurs n’ont pas choisi la formule, et un outil comptable qui bloque l’accès à ses propres registres pour une facture cesse d’être digne de confiance.",
+  'billing.contributorNote': "Le propriétaire doit changer de formule avant de publier de nouveaux chiffres. Votre relevé actuel n’est pas affecté.",
+  'billing.nothingToDo': "Rien à faire. Votre relevé de compte et son export sont gratuits à vie, quelle que soit la formule.",
+  'discord.subtitle': "Approbations et soldes là où l’équipe se trouve déjà",
+  'discord.ephemeral': "Les réponses sont éphémères : seule la personne qui lance la commande voit ses chiffres.",
+  'discord.httpNote': "Interactions HTTP, pas une connexion gateway. Chaque requête est vérifiée en Ed25519 avant d’être analysée.",
+  'discord.setup': "Configuration",
+  'discord.owedToYou': "Vous est dû :",
+  'common.expensesFor': "Objet",
+},
+  de: {
+  'nav.islands': 'Inseln', 'nav.account': 'Konto', 'nav.periods': 'Zeiträume',
+  'nav.bank': 'Bank', 'nav.pnl': 'Ergebnis', 'nav.people': 'Personen',
+  'nav.billing': 'Abrechnung', 'nav.discord': 'Discord',
+  'common.viewingAs': 'Angezeigt als', 'common.owner': 'Inhaber',
+  'common.contributor': 'Mitwirkender', 'common.contributorCol': 'Mitwirkender',
+  'common.share': 'Anteil', 'common.gross': 'Brutto', 'common.net': 'Netto',
+  'common.total': 'Gesamt', 'common.amount': 'Betrag', 'common.balance': 'Saldo',
+  'common.date': 'Datum', 'common.period': 'Zeitraum', 'common.island': 'Insel',
+  'common.expenses': 'Ausgaben', 'common.download': 'Herunterladen',
+  'common.cancel': 'Abbrechen', 'common.none': 'Keine',
+  'islands.title': 'Inseln',
+  'islands.subtitle': 'Aufteilungen gehören zu einer Insel, weil die Mitwirkenden je Insel verschieden sind',
+  'islands.window': 'Zeitfenster', 'islands.openEnded': 'unbefristet',
+  'islands.notOn': 'Nicht an dieser Insel beteiligt', 'islands.add': 'Insel hinzufügen',
+  'islands.name': 'Name', 'islands.code': 'Inselcode',
+  'islands.effective': 'Effektive Aufteilung je Zeitraum', 'islands.asWritten': 'wie vereinbart',
+  'account.title': 'Kontoauszug', 'account.owedToYou': 'Dir geschuldet',
+  'account.paidToYou': 'An dich gezahlt', 'account.openAdvances': 'Offene Vorschüsse',
+  'account.movement': 'Bewegung', 'account.owedNow': 'Dir aktuell geschuldet',
+  'account.download': 'Kontoauszug herunterladen',
+  'account.empty': 'Noch keine Bewegungen auf deinem Konto.',
+  'account.owedToContributors': 'Den Mitwirkenden geschuldet',
+  'account.settled': 'Alles ausgeglichen.', 'account.lastPaid': 'Zuletzt gezahlt',
+  'account.recordPayment': 'Zahlung erfassen', 'account.totalOutstanding': 'Gesamt offen',
+  'account.notMoving': 'Überweise das Geld über deine eigene Bank und erfasse es hier. Dieses Buch führt den Nachweis; es bewegt kein Geld.',
+  'entry.credit_provisional': 'Vorläufige Gutschrift', 'entry.credit_reversal': 'Schätzung storniert',
+  'entry.credit_final': 'Endgültige Gutschrift', 'entry.payment': 'Zahlung erhalten',
+  'entry.manual': 'Korrektur',
+  'periods.title': 'Zeiträume', 'periods.draft': 'Entwurf', 'periods.locked': 'gesperrt',
+  'periods.provisional': 'vorläufig', 'periods.final': 'endgültig',
+  'periods.lock': 'Diesen Zeitraum sperren', 'periods.postProvisional': 'Vorläufige Zahlen buchen',
+  'periods.postFinal': 'Endgültige Zahlen buchen', 'periods.useExample': 'Beispielzahlen verwenden',
+  'periods.byIsland': 'Nach Insel', 'periods.distributable': 'Verteilbar',
+  'periods.distributableAcross': 'Verteilbar über alle Inseln', 'periods.revision': 'Korrektur',
+  'periods.grossPayout': 'Bruttoauszahlung', 'periods.revenueStreams': 'Einnahmequellen',
+  'periods.allPeriods': 'Alle Zeiträume',
+  'periods.onlyEngagement': 'Nur die Engagement-Auszahlung sollte sich zwischen Schätzung und Endabrechnung ändern. Änderungen an festen Quellen werden als wahrscheinlicher Eingabefehler markiert.',
+  'periods.fixed': 'fest',
+  'stream.engagement': 'Engagement-Auszahlung', 'stream.in_island': 'Käufe auf der Insel',
+  'stream.sac': 'Support-a-Creator', 'stream.sponsored': 'Gesponserte Zeile',
+  'billing.title': 'Abrechnung', 'billing.subtitle': 'Preis nach Volumen, nicht pro Mitwirkendem',
+  'billing.trailingAverage': 'Gleitender Durchschnitt', 'billing.currentPlan': 'Aktueller Tarif',
+  'billing.monthlyCost': 'Monatliche Kosten', 'billing.plans': 'Tarife', 'billing.upTo': 'Bis zu',
+  'billing.price': 'Preis', 'billing.noLimit': 'ohne Limit', 'billing.free': 'Kostenlos',
+  'billing.current': 'aktuell', 'billing.choose': 'Wählen',
+  'billing.neverGated': 'Was nie gesperrt wird', 'billing.alwaysFree': 'immer kostenlos',
+  'billing.readOwn': 'Den eigenen Kontoauszug einsehen', 'billing.exportOwn': 'Ihn als CSV exportieren',
+  'billing.everyContributor': 'Jeder Mitwirkende erhält ein Konto',
+  'billing.postFigures': 'Neue Zahlen buchen', 'billing.needsBand': 'erfordert den passenden Tarif',
+  'bank.title': 'Bankabgleich',
+  'bank.subtitle': 'Was du erfasst hast, gegen das, was das Konto tatsächlich verlassen hat',
+  'bank.lines': 'Buchungen', 'bank.matched': 'Zugeordnet', 'bank.unexplained': 'Ungeklärt',
+  'bank.imported': 'Importierter Auszug', 'bank.matchedTo': 'Zugeordnet zu',
+  'bank.unmatched': 'nicht zugeordnet', 'bank.rerun': 'Abgleich erneut ausführen',
+  'bank.inBankNotRecorded': 'Auf dem Konto, aber nicht erfasst',
+  'bank.recordedNotInBank': 'Erfasst, aber nicht auf dem Konto',
+  'bank.ownerOnly': 'Nur der Inhaber kann Bankdaten sehen.',
+  'pnl.title': 'Gewinn und Verlust', 'pnl.subtitle': 'Nur endgültige Zeiträume',
+  'pnl.revenue': 'Einnahmen', 'pnl.net': 'Netto', 'pnl.byIsland': 'Einnahmen nach Insel',
+  'pnl.byStream': 'Einnahmen nach Quelle', 'pnl.byCategory': 'Ausgaben nach Kategorie',
+  'pnl.ownerOnly': 'Nur der Inhaber kann die Teamzahlen sehen.',
+  'people.title': 'Personen', 'people.team': 'Team', 'people.role': 'Rolle',
+  'people.makeOwner': 'Zum Inhaber machen', 'people.demote': 'Inhaberrecht entziehen',
+  'people.offboard': 'Entfernen', 'people.invite': 'Mitwirkenden einladen',
+  'people.email': 'E-Mail', 'people.createInvite': 'Einladungslink erstellen',
+  'people.offboardRules': 'Jemand kann nicht entfernt werden, solange ihm Geld zusteht, er zu viel erhalten hat oder einen unbefristeten Anteil an einer Insel hält.',
+  'theme.system': 'Auto', 'theme.light': 'Hell', 'theme.dark': 'Dunkel',
+  'discord.step1': "Anwendung erstellen",
+  'discord.step2': "Umgebungsvariablen setzen",
+  'discord.step3': "Interaktions-URL eintragen",
+  'discord.step4': "Befehle registrieren",
+  'islands.from': "ab {a}",
+  'islands.until': "bis {a}",
+  'islands.fromTo': "von {a} bis {b}",
+  'islands.sunsetNote': "Ein Anteil kann enden. Der Ablauf wird beim Lesen aufgelöst, sodass die Vereinbarung oben auch Jahre später lesbar bleibt.",
+  'account.creditedPaid': "Gutgeschrieben {credited} · gezahlt {paid}. Vorläufige Gutschriften werden storniert, sobald Epic die Endabrechnung veröffentlicht.",
+  'periods.lockNote': "Das Sperren fixiert die Aufteilung jeder Insel für diesen Zeitraum.",
+  'periods.lockedNote': "Gesperrt. Trage Epics vorläufige Zahlen aus dem Reiter Monetization Payout je Insel ein.",
+  'periods.ownerLocks': "Der Team-Inhaber sperrt den Zeitraum.",
+  'periods.provisionalNote': "Vorläufig. Gutschriften werden jetzt gebucht und storniert, sobald Epic die Endabrechnung veröffentlicht.",
+  'periods.finalNote': "Endgültig. Epic hat die Summe um {delta} korrigiert. Vorläufige Gutschriften wurden storniert und die endgültigen Zahlen gebucht.",
+  'expenses.none': "Keine Ausgaben erfasst.",
+  'expenses.deducted': "Wird vor der Aufteilung von dieser Insel abgezogen.",
+  'expenses.what': "Wofür",
+  'bank.moneyLeft': "Geld hat das Konto ohne passende Buchung verlassen — meist eine Ausgabe, die erfasst werden sollte.",
+  'pnl.noFinal': "Noch keine endgültigen Zeiträume.",
+  'people.inviteNote': "Die eingeladene Person legt ihr eigenes Passwort fest.",
+  'people.inviteLink': "Sende ihnen diesen Link. Er läuft in 7 Tagen ab und funktioniert einmal.",
+  'billing.onlyFinal': "Nur endgültige Zahlen zählen. Auf Basis einer später gesenkten Schätzung abzurechnen hieße, für nie erhaltenes Geld zu zahlen.",
+  'billing.neverGatedNote': "Mitwirkende haben den Tarif nicht gewählt, und ein Buchhaltungswerkzeug, das Menschen wegen einer Rechnung von den eigenen Aufzeichnungen aussperrt, ist nicht mehr vertrauenswürdig.",
+  'billing.contributorNote': "Der Inhaber muss den Tarif wechseln, bevor neue Zahlen gebucht werden können. Dein bestehender Auszug bleibt unberührt.",
+  'billing.nothingToDo': "Nichts zu tun. Dein Kontoauszug und dessen Export sind auf jedem Tarif dauerhaft kostenlos.",
+  'discord.subtitle': "Freigaben und Salden dort, wo das Team ohnehin ist",
+  'discord.ephemeral': "Antworten sind flüchtig, sodass nur die Person, die den Befehl ausführt, ihre Zahlen sieht.",
+  'discord.httpNote': "HTTP-Interaktionen statt einer Gateway-Verbindung. Jede Anfrage wird vor dem Parsen per Ed25519 verifiziert.",
+  'discord.setup': "Einrichtung",
+  'discord.owedToYou': "Dir geschuldet:",
+  'common.expensesFor': "Wofür",
+},
+  ja: {
+  'nav.islands': 'アイランド', 'nav.account': 'アカウント', 'nav.periods': '期間',
+  'nav.bank': '銀行', 'nav.pnl': '損益', 'nav.people': 'メンバー',
+  'nav.billing': '請求', 'nav.discord': 'Discord',
+  'common.viewingAs': '表示中', 'common.owner': 'オーナー',
+  'common.contributor': '参加者', 'common.contributorCol': '参加者',
+  'common.share': '取り分', 'common.gross': '総額', 'common.net': '純額',
+  'common.total': '合計', 'common.amount': '金額', 'common.balance': '残高',
+  'common.date': '日付', 'common.period': '期間', 'common.island': 'アイランド',
+  'common.expenses': '経費', 'common.download': 'ダウンロード',
+  'common.cancel': 'キャンセル', 'common.none': 'なし',
+  'islands.title': 'アイランド',
+  'islands.subtitle': '取り分はアイランドごとに設定します。参加者がアイランドごとに異なるためです',
+  'islands.window': '有効期間', 'islands.openEnded': '期限なし',
+  'islands.notOn': 'このアイランドには不参加', 'islands.add': 'アイランドを追加',
+  'islands.name': '名称', 'islands.code': 'アイランドコード',
+  'islands.effective': '期間ごとの実効取り分', 'islands.asWritten': '取り決めどおり',
+  'account.title': '取引明細', 'account.owedToYou': '未払い額',
+  'account.paidToYou': '支払済み額', 'account.openAdvances': '未回収の前払い',
+  'account.movement': '取引', 'account.owedNow': '現在の未払い額',
+  'account.download': '取引明細をダウンロード',
+  'account.empty': 'まだ取引はありません。',
+  'account.owedToContributors': '参加者への未払い',
+  'account.settled': 'すべて精算済みです。', 'account.lastPaid': '最終支払日',
+  'account.recordPayment': '支払いを記録', 'account.totalOutstanding': '未払い合計',
+  'account.notMoving': 'ご自身の銀行から送金し、ここに記録してください。この台帳は記録を保持するもので、送金は行いません。',
+  'entry.credit_provisional': '暫定計上', 'entry.credit_reversal': '暫定額の取消',
+  'entry.credit_final': '確定計上', 'entry.payment': '入金',
+  'entry.manual': '修正',
+  'periods.title': '期間', 'periods.draft': '下書き', 'periods.locked': '確定前',
+  'periods.provisional': '暫定', 'periods.final': '確定',
+  'periods.lock': 'この期間を確定前にする', 'periods.postProvisional': '暫定額を登録',
+  'periods.postFinal': '確定額を登録', 'periods.useExample': 'サンプル値を使う',
+  'periods.byIsland': 'アイランド別', 'periods.distributable': '分配可能額',
+  'periods.distributableAcross': 'アイランド全体の分配可能額', 'periods.revision': '修正差額',
+  'periods.grossPayout': '支払総額', 'periods.revenueStreams': '収益の種類',
+  'periods.allPeriods': 'すべての期間',
+  'periods.onlyEngagement': '暫定額と確定額の間で変動するのはエンゲージメント報酬のみです。固定と表示された項目が変わった場合は入力ミスの可能性として警告します。',
+  'periods.fixed': '固定',
+  'stream.engagement': 'エンゲージメント報酬', 'stream.in_island': 'アイランド内購入',
+  'stream.sac': 'Support-a-Creator', 'stream.sponsored': 'スポンサー枠',
+  'billing.title': '請求', 'billing.subtitle': '参加者数ではなく取扱高に応じた料金です',
+  'billing.trailingAverage': '直近の平均', 'billing.currentPlan': '現在のプラン',
+  'billing.monthlyCost': '月額', 'billing.plans': 'プラン', 'billing.upTo': '上限',
+  'billing.price': '料金', 'billing.noLimit': '上限なし', 'billing.free': '無料',
+  'billing.current': '利用中', 'billing.choose': '選択',
+  'billing.neverGated': '常に利用できる機能', 'billing.alwaysFree': '常に無料',
+  'billing.readOwn': '自分の取引明細の閲覧', 'billing.exportOwn': 'CSV での書き出し',
+  'billing.everyContributor': '参加者全員にアカウントを付与',
+  'billing.postFigures': '新しい金額の登録', 'billing.needsBand': '対応プランが必要',
+  'bank.title': '銀行照合',
+  'bank.subtitle': '記録した内容と、実際に口座から出た金額との照合',
+  'bank.lines': '明細件数', 'bank.matched': '照合済み', 'bank.unexplained': '未解決',
+  'bank.imported': '取り込んだ明細', 'bank.matchedTo': '照合先',
+  'bank.unmatched': '未照合', 'bank.rerun': '照合をやり直す',
+  'bank.inBankNotRecorded': '口座にあるが未記録',
+  'bank.recordedNotInBank': '記録済みだが口座にない',
+  'bank.ownerOnly': '銀行データはオーナーのみ閲覧できます。',
+  'pnl.title': '損益', 'pnl.subtitle': '確定した期間のみ',
+  'pnl.revenue': '収益', 'pnl.net': '純額', 'pnl.byIsland': 'アイランド別収益',
+  'pnl.byStream': '種類別収益', 'pnl.byCategory': 'カテゴリ別経費',
+  'pnl.ownerOnly': 'チームの損益はオーナーのみ閲覧できます。',
+  'people.title': 'メンバー', 'people.team': 'チーム', 'people.role': '役割',
+  'people.makeOwner': 'オーナーにする', 'people.demote': 'オーナー権限を外す',
+  'people.offboard': '離脱させる', 'people.invite': '参加者を招待',
+  'people.email': 'メールアドレス', 'people.createInvite': '招待リンクを作成',
+  'people.offboardRules': '未払いがある、過払いがある、またはいずれかのアイランドで期限のない取り分を持つ場合は離脱できません。',
+  'theme.system': '自動', 'theme.light': 'ライト', 'theme.dark': 'ダーク',
+  'discord.step1': "アプリケーションを作成",
+  'discord.step2': "環境変数を設定",
+  'discord.step3': "インタラクション URL を設定",
+  'discord.step4': "コマンドを登録",
+  'islands.from': "{a} から",
+  'islands.until': "{a} まで",
+  'islands.fromTo': "{a} から {b} まで",
+  'islands.sunsetNote': "取り分には終了日を設定できます。失効は参照時に計算されるため、上記の取り決めは何年後でもそのまま読めます。",
+  'account.creditedPaid': "計上 {credited} ・支払 {paid}。暫定計上は Epic が確定額を公表した時点で取り消されます。",
+  'periods.lockNote': "ロックすると各アイランドの取り分がこの期間に固定されます。",
+  'periods.lockedNote': "ロック済み。Epic の Monetization Payout タブの暫定額をアイランドごとに入力してください。",
+  'periods.ownerLocks': "期間のロックはチームのオーナーが行います。",
+  'periods.provisionalNote': "暫定。計上は今行われ、Epic が確定額を公表した時点で取り消されます。",
+  'periods.finalNote': "確定。Epic は合計を {delta} 修正しました。暫定計上は取り消され、確定額が計上されました。",
+  'expenses.none': "経費の記録はありません。",
+  'expenses.deducted': "分配前にそのアイランドから差し引かれます。",
+  'expenses.what': "用途",
+  'bank.moneyLeft': "対応する記録なしに口座から出金されています。通常は記録すべき経費です。",
+  'pnl.noFinal': "確定した期間はまだありません。",
+  'people.inviteNote': "招待された本人がパスワードを設定します。",
+  'people.inviteLink': "このリンクを送ってください。7日で失効し、1回のみ有効です。",
+  'billing.onlyFinal': "確定額のみを対象とします。後に下がる見込み額で課金すると、受け取っていない金額に課金することになります。",
+  'billing.neverGatedNote': "参加者はプランを選んでいません。請求を理由に自分の記録から締め出す会計ツールは、信頼に値しなくなります。",
+  'billing.contributorNote': "新しい金額を登録するにはオーナーがプランを変更する必要があります。既存の明細には影響しません。",
+  'billing.nothingToDo': "対応は不要です。取引明細とその書き出しは、どのプランでも永久に無料です。",
+  'discord.subtitle': "チームがすでにいる場所で承認と残高を確認",
+  'discord.ephemeral': "応答は一時的で、コマンドを実行した本人だけが自分の金額を見られます。",
+  'discord.httpNote': "ゲートウェイ接続ではなく HTTP インタラクションを使用します。すべてのリクエストは解析前に Ed25519 で検証されます。",
+  'discord.setup': "セットアップ",
+  'discord.owedToYou': "未払い額:",
+  'common.expensesFor': "用途",
+}
+};
+
+var LANG = (function(){
+  try{ var v=localStorage.getItem('isola-lang'); if(v&&STRINGS[v])return v; }catch(e){}
+  var nav=(navigator.language||'en');
+  if(/^pt/i.test(nav))return 'ptBR';
+  var base=nav.slice(0,2);
+  return STRINGS[base]?base:'en';
+})();
+
+/* Missing key falls back to English, never to a raw key. A money screen
+   showing "account.balance" is worse than one showing an English word. */
+function t(key,params){
+  var out=(STRINGS[LANG]&&STRINGS[LANG][key]) || STRINGS.en[key] || key;
+  if(params)for(var k in params)out=out.split('{'+k+'}').join(params[k]);
+  return out;
+}
+/* Country names come from Intl rather than the string table: the browser
+   already knows "United Kingdom" in every language, and duplicating that
+   into six hand-written lists would only create drift. */
+function countryName(code){
+  try{ return new Intl.DisplayNames([intlTag()],{type:'region'}).of(code)||code; }
+  catch(e){ return code; }
+}
+function intlTag(){ return (LOCALES[LANG]||LOCALES.en).intl; }
+function setLang(code){
+  if(!STRINGS[code])return;
+  LANG=code;
+  try{ localStorage.setItem('isola-lang',code); }catch(e){}
+  document.documentElement.setAttribute('lang', intlTag());
+  render();
+}
+</script>
+</head>
+<body>
+<div class="demo-bar">Demo &mdash; runs entirely in this page, no server. <b>Reload to reset.</b></div>
+<div class="wrap">
+  <header class="masthead">
+    <h1 class="wordmark">Isola</h1>
+    <div style="display:flex; align-items:center; gap:.75rem; flex-wrap:wrap">
+      <div class="masthead-meta" id="meta"></div>
+      <select id="lang-select" aria-label="Language"
+        style="width:auto;padding:.25rem .5rem;font-size:.75rem;border-radius:999px">
+      </select>
+      <div class="theme-toggle" id="theme-toggle" role="group" aria-label="Colour theme">
+        <button data-theme-set="system" type="button">Auto</button>
+        <button data-theme-set="light" type="button">Light</button>
+        <button data-theme-set="dark" type="button">Dark</button>
+      </div>
+    </div>
+  </header>
+  <nav class="tabs" id="tabs"></nav>
+  <main id="app" aria-live="polite"></main>
+</div>
+
+<script>
+/* ============================================================ *
+ * Engine — mirrors src/ledger.js
+ * ============================================================ */
+const BPS=10000;
+function validateAllocations(a){
+  const t=a.reduce((s,x)=>s+x.bps,0);
+  if(t!==BPS)throw new Error(`Split totals ${(t/100).toFixed(2)}%, needs to total 100%`);
+  return true;
+}
+function distribute(amount,allocs){
+  const rows=allocs.map(a=>{const e=amount*a.bps;
+    return{memberId:a.memberId,bps:a.bps,base:Math.floor(e/BPS),rem:e%BPS};});
+  let left=amount-rows.reduce((s,r)=>s+r.base,0);
+  [...rows].sort((x,y)=>y.rem-x.rem||(x.memberId<y.memberId?-1:1))
+    .forEach(r=>{if(left>0){r.base+=1;left-=1;}});
+  return rows.map(r=>({memberId:r.memberId,bps:r.bps,grossCents:r.base}));
+}
+const isActiveIn=(a,l)=>!(a.fromLabel&&l<a.fromLabel)&&!(a.toLabel&&l>a.toLabel);
+
+function resolveAllocations(allocations,periodLabel){
+  validateAllocations(allocations);
+  const active=allocations.filter(a=>isActiveIn(a,periodLabel));
+  if(!active.length)throw new Error(`No contributor holds a share in ${periodLabel}.`);
+  const total=active.reduce((s,a)=>s+a.bps,0);
+  if(total===BPS)return active.map(a=>({memberId:a.memberId,bps:a.bps}));
+  const freed=BPS-total;
+  const rows=active.map(a=>{const e=freed*a.bps;
+    return{memberId:a.memberId,base:a.bps+Math.floor(e/total),rem:e%total};});
+  let left=BPS-rows.reduce((s,r)=>s+r.base,0);
+  [...rows].sort((x,y)=>y.rem-x.rem||(x.memberId<y.memberId?-1:1))
+    .forEach(r=>{if(left>0){r.base+=1;left-=1;}});
+  return rows.map(r=>({memberId:r.memberId,bps:r.base}));
+}
+
+/** Epic's four payout streams. Only engagement moves between estimate and final. */
+const STREAMS={
+  engagement:{label:'Engagement payout',revisable:true},
+  in_island:{label:'In-island transactions',revisable:false},
+  sac:{label:'Support-a-Creator',revisable:false},
+  sponsored:{label:'Sponsored row',revisable:false},
+};
+const STREAM_KEYS=Object.keys(STREAMS);
+
+function classifyRevision(before,after){
+  const sum=(ls,k)=>ls.filter(l=>l.stream===k).reduce((t,l)=>t+l.amountCents,0);
+  const unexpected=[];
+  STREAM_KEYS.filter(k=>!STREAMS[k].revisable).forEach(k=>{
+    const b=sum(before,k),a=sum(after,k);
+    if(b!==a)unexpected.push({stream:k,label:STREAMS[k].label,deltaCents:a-b});});
+  return{engagementDeltaCents:sum(after,'engagement')-sum(before,'engagement'),
+         unexpected,clean:unexpected.length===0};
+}
+
+const PLANS=[
+  {key:'free',label:'Free',priceCents:0,maxMonthlyCents:200000,blurb:'For teams still finding an audience.'},
+  {key:'starter',label:'Starter',priceCents:3900,maxMonthlyCents:2500000,blurb:'For a team splitting real money every month.'},
+  {key:'studio',label:'Studio',priceCents:8900,maxMonthlyCents:10000000,blurb:'Several islands, several collaborators, bank reconciliation.'},
+  {key:'pro',label:'Pro',priceCents:19900,maxMonthlyCents:Infinity,blurb:'For studios at the top of the Discover charts.'},
+];
+const PLAN_BY_KEY=Object.fromEntries(PLANS.map(p=>[p.key,p]));
+
+/** Averaged over trailing months, so one good season does not move a team up a tier. */
+function bandFor(byMonth){
+  const m=Object.values(byMonth||{});
+  const avg=m.length?Math.round(m.reduce((t,c)=>t+c,0)/m.length):0;
+  const plan=PLANS.find(p=>avg<=p.maxMonthlyCents)||PLANS[PLANS.length-1];
+  return{averageMonthlyCents:avg,monthsCounted:m.length,requiredPlan:plan.key};
+}
+
+/** Reading your own records is never gated. Billing pressure applies to posting only. */
+function entitlements(sub,band){
+  const cur=PLAN_BY_KEY[sub?.plan]||PLAN_BY_KEY.free;
+  const req=PLAN_BY_KEY[band.requiredPlan];
+  const over=req.priceCents>cur.priceCents;
+  const grace=sub?.graceEndsAt?new Date(sub.graceEndsAt):null;
+  const inGrace=Boolean(over&&grace&&new Date()<grace);
+  const blocked=over&&!inGrace;
+  return{currentPlan:cur.key,requiredPlan:req.key,over,inGrace,
+    graceDaysLeft:inGrace?Math.ceil((grace-new Date())/864e5):0,
+    canReadOwnAccount:true,canExportOwnStatement:true,
+    canPostFigures:!blocked,
+    reason:blocked?`Your trailing average needs the ${req.label} plan. Existing records stay readable and exportable; posting new figures is paused until you upgrade.`
+      :inGrace?`You have moved into the ${req.label} band. Upgrade before posting pauses.`:null};
+}
+
+const PAYOUT_THRESHOLD=10000;
+const thresholdStatus=c=>({thresholdCents:PAYOUT_THRESHOLD,accumulatedCents:c,
+  shortfallCents:c>=PAYOUT_THRESHOLD?0:PAYOUT_THRESHOLD-c,met:c>=PAYOUT_THRESHOLD});
+
+/**
+ * One statement per island, merged into per-contributor lines. Advances
+ * and carried adjustments belong to the person, so they apply once against
+ * the merged total rather than once per island.
+ */
+function buildPeriodStatement({periodId,stage,islands,advances=[],
+                               recoupMode='from_member',adjustments=[]}){
+  if(!islands||!islands.length)throw new Error('A period needs at least one island');
+  const perIsland=[],merged=new Map();
+
+  for(const isle of islands){
+    const allocs=resolveAllocations(isle.allocations,periodId);
+    const exp=isle.expenseCents||0;
+    if(exp>isle.grossCents)
+      throw new Error(`${isle.islandName}: expenses exceed the payout for this period.`);
+    const dist=isle.grossCents-exp;
+    const lines=distribute(dist,allocs);
+    perIsland.push({islandId:isle.islandId,islandName:isle.islandName,code:isle.code,
+      grossCents:isle.grossCents,expenseCents:exp,distributableCents:dist,lines});
+    lines.forEach(l=>{
+      const e=merged.get(l.memberId)||{memberId:l.memberId,grossCents:0,islands:[]};
+      e.grossCents+=l.grossCents;
+      e.islands.push({islandName:isle.islandName,bps:l.bps,grossCents:l.grossCents});
+      merged.set(l.memberId,e);});
+  }
+
+  const shares=[...merged.values()].map(m=>({...m,recoupedCents:0}));
+  const byMember=new Map(shares.map(s=>[s.memberId,s]));
+  const applied=[];
+  for(const adv of advances.filter(a=>a.outstandingCents>0)){
+    const s=byMember.get(adv.memberId); if(!s)continue;
+    const take=Math.min(adv.outstandingCents,Math.max(0,s.grossCents-s.recoupedCents));
+    if(take>0){s.recoupedCents+=take;
+      applied.push({advanceId:adv.id,memberId:adv.memberId,appliedCents:take});}}
+
+  const adjMap=new Map();
+  adjustments.forEach(a=>adjMap.set(a.memberId,(adjMap.get(a.memberId)||0)+a.amountCents));
+
+  const lines=shares.map(s=>{const adj=adjMap.get(s.memberId)||0;
+    return{memberId:s.memberId,grossCents:s.grossCents,recoupedCents:s.recoupedCents,
+           adjustmentCents:adj,netCents:s.grossCents-s.recoupedCents+adj,islands:s.islands};})
+    .sort((a,b)=>b.grossCents-a.grossCents);
+
+  return{periodId,stage,islands:perIsland,
+    grossCents:perIsland.reduce((t,i)=>t+i.grossCents,0),
+    expenseCents:perIsland.reduce((t,i)=>t+i.expenseCents,0),
+    distributableCents:perIsland.reduce((t,i)=>t+i.distributableCents,0),
+    recoupApplied:stage==='final'?applied:[],recoupProjected:stage==='provisional'?applied:[],
+    lines,totalNetCents:lines.reduce((t,l)=>t+l.netCents,0)};
+}
+
+function reconcile(prov,fin,carryTo){
+  const before=new Map(prov.lines.map(l=>[l.memberId,l.netCents]));
+  return{grossDeltaCents:fin.grossCents-prov.grossCents,
+    adjustments:fin.lines.map(l=>({memberId:l.memberId,
+      amountCents:l.netCents-(before.get(l.memberId)??0),carryToPeriodId:carryTo}))
+      .filter(a=>a.amountCents!==0)};
+}
+function matchBank(rows,payments){
+  const taken=new Set();let matched=0;
+  rows.filter(r=>!r.matchedId).forEach(row=>{
+    const out=Math.abs(row.amountCents);
+    let hit=row.reference?payments.find(p=>!taken.has(p.id)&&p.reference&&p.reference===row.reference):null;
+    if(!hit){const same=payments.filter(p=>!taken.has(p.id)&&Math.abs(p.amountCents)===out);
+      if(same.length===1)hit=same[0];}
+    if(hit){taken.add(hit.id);row.matchedId=hit.id;matched++;}});
+  return{matched,examined:rows.length};
+}
+function normaliseIslandCode(input){
+  const d=String(input||'').replace(/\D/g,'');
+  if(d.length!==12)throw new Error('An island code is twelve digits, written 1234-5678-9012.');
+  return `${d.slice(0,4)}-${d.slice(4,8)}-${d.slice(8)}`;
+}
+
+/* ============================================================ *
+ * Seeded state
+ * ============================================================ */
+const M={maya:'Maya R.',dev:'Dev K.',sam:'Sam T.',jordi:'Jordi P.'};
+const ROLES={maya:'Lead dev, Verse',dev:'Builder',sam:'UI and art',jordi:'Live ops'};
+const entryLabel=k=>t('entry.'+k);
+
+let S,seq=0;
+const eid=()=>`e${++seq}`;
+
+function seed(){
+  const advances=[{id:'adv1',memberId:'sam',outstandingCents:50000,note:'Art budget, recoupable'}];
+
+  // Two islands, different rosters. Sam does art on Neon and nothing on
+  // Skybound, which a single team-wide split could not express.
+  const islands=[
+    {id:'isl_neon',name:'Neon Heist',code:'1234-5678-9012',status:'live',
+     allocations:[{memberId:'maya',bps:4000},{memberId:'dev',bps:3000},
+                  {memberId:'sam',bps:2000,toLabel:'2026-12'},{memberId:'jordi',bps:1000}]},
+    {id:'isl_sky',name:'Skybound Tycoon',code:'9876-5432-1098',status:'live',
+     allocations:[{memberId:'maya',bps:5000},{memberId:'dev',bps:3000},{memberId:'jordi',bps:2000}]},
+  ];
+
+  const expenses=[
+    {id:'x1',islandId:'isl_neon',periodLabel:'2026-09',description:'Commissioned character art',amountCents:32000,category:'Art'},
+    {id:'x2',islandId:'isl_neon',periodLabel:'2026-09',description:'Soundtrack licence',amountCents:12000,category:'Audio'},
+  ];
+
+  const provRevenue=[
+    {islandId:'isl_neon',stream:'engagement',amountCents:1124000},
+    {islandId:'isl_neon',stream:'in_island',amountCents:618000},
+    {islandId:'isl_neon',stream:'sac',amountCents:71200},
+    {islandId:'isl_neon',stream:'sponsored',amountCents:30000},
+    {islandId:'isl_sky',stream:'engagement',amountCents:420000},
+    {islandId:'isl_sky',stream:'in_island',amountCents:96000},
+  ];
+  const finRevenue=[
+    {islandId:'isl_neon',stream:'engagement',amountCents:1069800},
+    {islandId:'isl_neon',stream:'in_island',amountCents:618000},
+    {islandId:'isl_neon',stream:'sac',amountCents:71200},
+    {islandId:'isl_neon',stream:'sponsored',amountCents:30000},
+    {islandId:'isl_sky',stream:'engagement',amountCents:398000},
+    {islandId:'isl_sky',stream:'in_island',amountCents:96000},
+  ];
+
+  const inputs=(rev)=>islands.map(i=>({
+    islandId:i.id,islandName:i.name,code:i.code,
+    grossCents:rev.filter(r=>r.islandId===i.id).reduce((t,r)=>t+r.amountCents,0),
+    expenseCents:expenses.filter(x=>x.islandId===i.id&&x.periodLabel==='2026-09')
+      .reduce((t,x)=>t+x.amountCents,0),
+    allocations:i.allocations}));
+
+  const prov=buildPeriodStatement({periodId:'2026-09',stage:'provisional',islands:inputs(provRevenue),advances});
+  const fin=buildPeriodStatement({periodId:'2026-09',stage:'final',islands:inputs(finRevenue),advances});
+  const rec=reconcile(prov,fin,'2026-10');
+
+  const entries=[];
+  const post=(u,t,c,d,x={})=>entries.push({id:eid(),userId:u,entryType:t,amountCents:c,
+    description:d,periodLabel:x.period||'',reference:x.ref||'',effectiveAt:x.at||'2026-09-02'});
+
+  prov.lines.forEach(l=>post(l.memberId,'credit_provisional',l.netCents,
+    'Provisional share of 2026-09',{period:'2026-09',at:'2026-09-02'}));
+  prov.lines.forEach(l=>post(l.memberId,'credit_reversal',-l.netCents,
+    'Reversal of provisional estimate for 2026-09',{period:'2026-09',at:'2026-10-30'}));
+  fin.lines.forEach(l=>post(l.memberId,'credit_final',l.netCents,
+    'Final share of 2026-09',{period:'2026-09',at:'2026-10-30'}));
+  fin.recoupApplied.forEach(a=>{const adv=advances.find(x=>x.id===a.advanceId);
+    if(adv)adv.outstandingCents=Math.max(0,adv.outstandingCents-a.appliedCents);});
+
+  const bal=k=>entries.filter(e=>e.userId===k).reduce((t,e)=>t+e.amountCents,0);
+  post('dev','payment',-bal('dev'),'September settlement',{method:'Bank transfer',ref:'FPS-90412',at:'2026-11-03'});
+  post('sam','payment',-Math.floor(bal('sam')/2),'Part payment, rest to follow',{method:'PayPal',ref:'PP-7761224',at:'2026-11-03'});
+
+  const pay=t=>entries.find(e=>e.entryType==='payment'&&e.userId===t);
+
+  S={
+    you:'maya',
+    roles:{maya:'owner',dev:'contributor',sam:'contributor',jordi:'contributor'},
+    active:{maya:true,dev:true,sam:true,jordi:true},
+    team:{name:'Neon Heist Studio',currency:'USD',recoupMode:'from_member'},
+    islands,expenses,advances,entries,
+    periods:[
+      {label:'2026-09',state:'final',statements:{provisional:prov,final:fin},
+       revenue:{provisional:provRevenue,final:finRevenue}},
+      {label:'2026-10',state:'draft',statements:{},revenue:{}}],
+    adjustments:rec.adjustments.map(a=>({...a,carryTo:'2026-10',consumed:false})),
+    bank:[
+      {id:'b1',date:'2026-11-03',description:'FASTER PAYMENT DEV K',amountCents:pay('dev').amountCents,reference:'FPS-90412',matchedId:null},
+      {id:'b2',date:'2026-11-03',description:'PAYPAL TRANSFER',amountCents:pay('sam').amountCents,reference:'',matchedId:null},
+      {id:'b3',date:'2026-11-04',description:'ADOBE CREATIVE CLOUD',amountCents:-5999,reference:'',matchedId:null},
+    ],
+    invites:[],discord:{maya:'249xxxxxxxxxxx0182'},
+    subscription:{plan:'starter',status:'active',graceEndsAt:null},
+    tab:'islands',view:{},error:null,notice:null,
+  };
+  matchBank(S.bank,S.entries.filter(e=>e.entryType==='payment'));
+}
+seed();
+
+/* ============================================================ *
+ * Helpers
+ * ============================================================ */
+const app=document.getElementById('app'),meta=document.getElementById('meta'),tabsEl=document.getElementById('tabs');
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=c=>(c<0?'\u2212':'')+new Intl.NumberFormat(intlTag(),{style:'currency',currency:'USD',
+  minimumFractionDigits:2,maximumFractionDigits:2}).format(Math.abs(c)/100);
+const pct=b=>`${(b/100).toFixed(b%100===0?0:2)}%`;
+const toCents=v=>{const c=String(v).replace(/[^0-9.]/g,'');if(!c)return null;
+  const[w,f='']=c.split('.');return (parseInt(w,10)||0)*100+(parseInt((f+'00').slice(0,2),10)||0);};
+const fmtDate=d=>new Date(d).toLocaleDateString(intlTag(),{day:'numeric',month:'short',year:'2-digit'});
+
+const balanceOf=k=>S.entries.filter(e=>e.userId===k).reduce((t,e)=>t+e.amountCents,0);
+const entriesOf=k=>S.entries.filter(e=>e.userId===k)
+  .sort((a,b)=>a.effectiveAt<b.effectiveAt?-1:a.effectiveAt>b.effectiveAt?1:0);
+const liveIslands=()=>S.islands.filter(i=>i.status==='live');
+const expenseFor=(islandId,label)=>S.expenses
+  .filter(x=>x.islandId===islandId&&x.periodLabel===label).reduce((t,x)=>t+x.amountCents,0);
+const pendingFor=l=>S.adjustments.filter(a=>a.carryTo===l&&!a.consumed);
+const isOwner=()=>S.roles[S.you]==='owner';
+const payments=()=>S.entries.filter(e=>e.entryType==='payment');
+const windowNote=a=>a.fromLabel&&a.toLabel?t('islands.fromTo',{a:a.fromLabel,b:a.toLabel})
+  :a.fromLabel?t('islands.from',{a:a.fromLabel})
+  :a.toLabel?t('islands.until',{a:a.toLabel}):t('islands.openEnded');
+
+function banners(){
+  let h='';
+  if(S.error)h+=`<div class="error" role="alert">${esc(S.error)}</div>`;
+  if(S.notice)h+=`<div class="notice">${esc(S.notice)}</div>`;
+  return h;
+}
+function whoami(){
+  return `<div class="whoami"><span>${esc(t('common.viewingAs'))}</span>${Object.keys(M).map(k=>
+    `<button data-who="${k}" aria-pressed="${S.you===k}"${S.active[k]?'':' style="opacity:.45"'}>${esc(M[k])}</button>`).join('')}
+    <span>&nbsp;${esc(S.roles[S.you])}</span></div>`;
+}
+const totalRow=(l,c)=>`<div class="total-row"><span class="k">${esc(l)}</span><span class="v">${money(c)}</span></div>`;
+const metrics=items=>`<div class="metrics">${items.map(i=>`<div class="metric">
+  <div class="label">${esc(i.label)}</div>
+  <div class="value${i.muted?' muted':''}"${i.tone?` style="color:var(--${i.tone})"`:''}>${i.value}</div></div>`).join('')}</div>`;
+function downloadCsv(rows,name){
+  const text=rows.map(r=>r.map(c=>/[",\n]/.test(String(c))?`"${String(c).replace(/"/g,'""')}"`:c)
+    .join(',')).join('\r\n');
+  const url=URL.createObjectURL(new Blob([text],{type:'text/csv'}));
+  const a=document.createElement('a');a.href=url;a.download=name;a.click();URL.revokeObjectURL(url);
+}
+
+const TAB_KEYS=['islands','account','periods','bank','pnl','people','billing','discord'];
+function renderTabs(){
+  tabsEl.innerHTML=TAB_KEYS.map(k=>
+    `<button class="tab" data-tab="${k}" aria-pressed="${S.tab===k}">${esc(t('nav.'+k))}</button>`).join('');
+  tabsEl.querySelectorAll('[data-tab]').forEach(el=>el.onclick=()=>{
+    S.tab=el.dataset.tab;S.view={};S.error=S.notice=null;render();});
+}
+
+/* ============================================================ *
+ * Islands tab
+ * ============================================================ */
+function viewIslands(){
+  app.innerHTML=`${whoami()}${banners()}<div class="stack">
+    <div style="margin-bottom:.4rem"><h2>${esc(t('islands.title'))}</h2>
+      <p class="hint" style="margin:.2rem 0 0">${esc(t('islands.subtitle'))}</p></div>
+
+    ${S.islands.map(i=>`<div class="sheet">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+        <h3 style="margin:0">${esc(i.name)}</h3>
+        <span class="hint num">${esc(i.code||'no code')}</span></div>
+      <table style="margin-top:.9rem"><thead><tr><th>${esc(t('common.contributorCol'))}</th><th class="r">${esc(t('common.share'))}</th>
+        <th class="r">${esc(t('islands.window'))}</th></tr></thead><tbody>
+      ${i.allocations.map(a=>`<tr><td>${esc(M[a.memberId])}<span class="role">${esc(ROLES[a.memberId])}</span></td>
+        <td class="r num">${pct(a.bps)}</td><td class="r hint">${esc(windowNote(a))}</td></tr>`).join('')}
+      </tbody></table>
+      <div class="signatures">${i.allocations.map(a=>
+        `<span class="signature">\u2713 ${esc(M[a.memberId])}</span>`).join('')}</div>
+      ${Object.keys(M).filter(k=>!i.allocations.some(a=>a.memberId===k)).length
+        ? `<p class="hint" style="margin:.9rem 0 0">${esc(t('islands.notOn'))}:
+           ${Object.keys(M).filter(k=>!i.allocations.some(a=>a.memberId===k)).map(k=>esc(M[k])).join(', ')}</p>`
+        : ''}
+    </div>`).join('')}
+
+    ${isOwner()?`<div class="sheet"><h3>${esc(t('islands.add'))}</h3>
+      <div class="row">
+        <div style="flex:2"><label for="i-name">${esc(t('islands.name'))}</label><input id="i-name" placeholder="Tycoon Valley" /></div>
+        <div><label for="i-code">${esc(t('islands.code'))}</label><input id="i-code" placeholder="1234-5678-9012" /></div></div>
+      <div class="actions"><button class="primary" id="add-island">${esc(t('islands.add'))}</button></div></div>`:''}
+
+    <div class="sheet"><h3>${esc(t('islands.effective'))}</h3>
+      <p class="hint" style="margin:0 0 .9rem">${esc(t('islands.sunsetNote'))}</p>
+      ${['2026-09','2027-01'].map(l=>`
+        <div style="margin-bottom:1rem"><div class="hint num" style="margin-bottom:.4rem">${esc(l)}</div>
+        <table><tbody>${(()=>{try{
+          return resolveAllocations(S.islands[0].allocations,l).map(r=>{
+            const w=S.islands[0].allocations.find(a=>a.memberId===r.memberId).bps;
+            return `<tr><td>${esc(M[r.memberId])}</td><td class="r num hint">${pct(w)} ${esc(t('islands.asWritten'))}</td>
+              <td class="r num${r.bps!==w?' pos':''}">${pct(r.bps)}</td></tr>`;}).join('');
+        }catch(e){return `<tr><td colspan="3" class="hint">${esc(e.message)}</td></tr>`;}})()}
+        </tbody></table></div>`).join('')}
+    </div>
+  </div>`;
+
+  const add=document.getElementById('add-island');
+  if(add)add.onclick=()=>{
+    const name=document.getElementById('i-name').value.trim();
+    const raw=document.getElementById('i-code').value.trim();
+    if(!name){S.error='Give the island a name.';return render();}
+    let code=null;
+    if(raw){try{code=normaliseIslandCode(raw);}catch(e){S.error=e.message;return render();}}
+    if(S.islands.some(i=>i.name===name)){S.error='There is already an island with that name.';return render();}
+    S.islands.push({id:'isl_'+(S.islands.length+1),name,code,status:'live',
+      allocations:[{memberId:S.you,bps:10000}]});
+    S.error=null;S.notice=`${name} added with you at 100%. Change the split before posting figures.`;
+    render();};
+}
+
+/* ============================================================ *
+ * Account tab
+ * ============================================================ */
+function viewAccount(){
+  const mine=entriesOf(S.you);
+  let running=0;
+  const rows=mine.map(e=>{running+=e.amountCents;
+    return `<tr><td class="num">${esc(e.effectiveAt)}</td>
+      <td>${esc(entryLabel(e.entryType))}${e.reference?`<span class="role">${esc(e.reference)}</span>`:''}</td>
+      <td class="r num ${e.amountCents<0?'neg':'pos'}">${money(e.amountCents)}</td>
+      <td class="r num">${money(running)}</td></tr>`;}).join('');
+  const credited=mine.filter(e=>e.amountCents>0).reduce((t,e)=>t+e.amountCents,0);
+  const paid=mine.filter(e=>e.entryType==='payment').reduce((t,e)=>t+Math.abs(e.amountCents),0);
+  const th=thresholdStatus(mine.filter(e=>e.entryType==='credit_final').reduce((t,e)=>t+e.amountCents,0));
+  const openAdv=S.advances.filter(a=>a.outstandingCents>0&&a.memberId===S.you);
+  const payable=Object.keys(M).map(k=>({k,balance:balanceOf(k),
+    lastPaid:(entriesOf(k).filter(e=>e.entryType==='payment').pop()||{}).effectiveAt}))
+    .filter(b=>b.balance!==0);
+
+  app.innerHTML=`${whoami()}${banners()}<div class="stack">
+    <div style="margin-bottom:.4rem"><h2>${esc(M[S.you])}</h2></div>
+
+    ${metrics([
+      {label:t('account.owedToYou'),value:money(balanceOf(S.you))},
+      {label:t('account.paidToYou'),value:money(paid)},
+      {label:t('account.openAdvances'),value:openAdv.length?money(openAdv.reduce((t,a)=>t+a.outstandingCents,0)):'\u2014',muted:!openAdv.length},
+    ])}
+
+    ${!th.met?`<div class="notice">${money(th.accumulatedCents)} of Epic's ${money(th.thresholdCents)}
+      payout threshold. Epic holds engagement payouts until $100 accumulates over a rolling 12 months,
+      so ${money(th.shortfallCents)} more must land before anything is paid out.</div>`:''}
+
+    <div class="sheet"><h3>${esc(t('account.title'))}</h3>
+      ${!mine.length?`<p class="hint" style="margin:0">${esc(t('account.empty'))}</p>`:
+      `<table><thead><tr><th>${esc(t('common.date'))}</th><th>${esc(t('account.movement'))}</th><th class="r">${esc(t('common.amount'))}</th><th class="r">${esc(t('common.balance'))}</th></tr></thead>
+       <tbody>${rows}</tbody></table>${totalRow(t('account.owedNow'),balanceOf(S.you))}
+       <p class="hint" style="margin:.9rem 0 0">${esc(t('account.creditedPaid',{credited:money(credited),paid:money(paid)}))}</p>
+       <div class="actions"><button id="csv">${esc(t('account.download'))}</button></div>`}
+    </div>
+
+    ${isOwner()?`<div class="sheet"><h3>${esc(t('account.owedToContributors'))}</h3>
+      ${!payable.length?`<p class="hint" style="margin:0">${esc(t('account.settled'))}</p>`:
+      `<table><thead><tr><th>${esc(t('common.contributorCol'))}</th><th class="r">${esc(t('account.owedToYou'))}</th><th class="r">${esc(t('account.lastPaid'))}</th><th></th></tr></thead>
+       <tbody>${payable.map(b=>`<tr><td>${esc(M[b.k])}</td><td class="r num">${money(b.balance)}</td>
+         <td class="r num hint">${b.lastPaid?esc(fmtDate(b.lastPaid)):'\u2014'}</td>
+         <td class="r"><button class="quiet" data-pay="${b.k}">${esc(t('account.recordPayment'))}</button></td></tr>`).join('')}
+       </tbody></table>${totalRow(t('account.totalOutstanding'),payable.reduce((t,b)=>t+Math.max(0,b.balance),0))}
+       <p class="hint" style="margin:.9rem 0 0">${esc(t('account.notMoving'))}</p>`}
+      <div id="pay-form"></div></div>`:''}
+  </div>`;
+
+  const csv=document.getElementById('csv');
+  if(csv)csv.onclick=()=>{
+    const d=c=>(c/100).toFixed(2);let r=0;
+    const out=[['Statement of account'],['Team',S.team.name],['Contributor',M[S.you]],['Currency','USD'],[],
+      ['Date','Type','Period','Description','Reference','Credit','Debit','Balance'],
+      ['','Opening balance','','','','','',d(0)]];
+    mine.forEach(e=>{r+=e.amountCents;
+      out.push([e.effectiveAt,entryLabel(e.entryType),e.periodLabel,e.description,e.reference,
+        e.amountCents>0?d(e.amountCents):'',e.amountCents<0?d(Math.abs(e.amountCents)):'',d(r)]);});
+    out.push([],['','Closing balance owed','','','','','',d(balanceOf(S.you))]);
+    downloadCsv(out,`isola-${S.you}-statement.csv`);};
+
+  document.querySelectorAll('[data-pay]').forEach(el=>el.onclick=()=>payForm(el.dataset.pay));
+}
+
+function payForm(who){
+  const owed=balanceOf(who);
+  document.getElementById('pay-form').innerHTML=`
+    <div style="margin-top:1.1rem;padding-top:1.1rem;border-top:1px solid var(--border-2)">
+      <h3>Payment to ${esc(M[who])}</h3>
+      <div class="row">
+        <div><label for="pf-amt">Amount</label>
+          <input id="pf-amt" class="num-input" inputmode="decimal" value="${(owed/100).toFixed(2)}" /></div>
+        <div><label for="pf-ref">Reference</label><input id="pf-ref" placeholder="FPS-90414" /></div></div>
+      <p class="hint" style="margin:.7rem 0 0">Owed right now: ${money(owed)}. Partial payments are fine.</p>
+      <div class="actions"><button class="primary" id="pf-save">${esc(t('account.recordPayment'))}</button>
+        <button class="quiet" id="pf-cancel">${esc(t('common.cancel'))}</button></div></div>`;
+  document.getElementById('pf-cancel').onclick=()=>{document.getElementById('pay-form').innerHTML='';};
+  document.getElementById('pf-save').onclick=()=>{
+    const cents=toCents(document.getElementById('pf-amt').value);
+    if(!cents){S.error='Enter an amount.';return render();}
+    if(cents>owed){S.error=`That is more than ${M[who]} is owed (${money(owed)}).`;return render();}
+    S.entries.push({id:eid(),userId:who,entryType:'payment',amountCents:-cents,
+      description:'Payment sent',periodLabel:'',reference:document.getElementById('pf-ref').value||'',
+      effectiveAt:new Date().toISOString().slice(0,10)});
+    S.error=null;S.notice=`Recorded ${money(cents)} to ${M[who]}.`;render();};
+}
+
+/* ============================================================ *
+ * Periods tab
+ * ============================================================ */
+const revenueInputs=prefix=>liveIslands().map(i=>`
+  <div style="margin-bottom:1.1rem">
+    <div style="display:flex;align-items:baseline;justify-content:space-between">
+      <h3 style="margin:0 0 .5rem">${esc(i.name)}</h3>
+      <span class="hint num">${esc(i.code||'')}</span></div>
+    ${STREAM_KEYS.map(k=>`<div class="row" style="margin-bottom:.4rem"><div style="flex:2">
+      <label for="${prefix}-${i.id}-${k}">${esc(STREAMS[k].label)}${STREAMS[k].revisable?'':' <span class="hint">· fixed</span>'}</label>
+      <input class="num-input" id="${prefix}-${i.id}-${k}" data-island="${i.id}" data-stream="${k}"
+        inputmode="decimal" placeholder="0.00" /></div></div>`).join('')}
+  </div>`).join('')
+  +`<p class="hint">${esc(t('periods.onlyEngagement'))}</p>`;
+
+function collectRevenue(prefix){
+  const out=[];
+  document.querySelectorAll(`[id^="${prefix}-"]`).forEach(el=>{
+    const c=toCents(el.value);
+    if(c)out.push({islandId:el.dataset.island,stream:el.dataset.stream,amountCents:c});});
+  return out;
+}
+
+function statementTable(st,compare){
+  const before=compare?new Map(compare.lines.map(l=>[l.memberId,l.netCents])):null;
+  const anyRecoup=st.lines.some(l=>l.recoupedCents),anyAdj=st.lines.some(l=>l.adjustmentCents);
+  return `<div class="sheet" style="margin-bottom:1.1rem"><h3>${esc(t('periods.byIsland'))}</h3>
+    <table><thead><tr><th>${esc(t('common.island'))}</th><th class="r">${esc(t('common.gross'))}</th><th class="r">${esc(t('common.expenses'))}</th>
+      <th class="r">${esc(t('periods.distributable'))}</th></tr></thead><tbody>
+    ${st.islands.map(i=>`<tr><td>${esc(i.islandName)}<span class="role">${esc(i.code||'')}</span></td>
+      <td class="r num">${money(i.grossCents)}</td>
+      <td class="r num ${i.expenseCents?'neg':''}">${i.expenseCents?money(-i.expenseCents):'\u2014'}</td>
+      <td class="r num">${money(i.distributableCents)}</td></tr>`).join('')}
+    </tbody></table>${totalRow(t('periods.distributableAcross'),st.distributableCents)}</div>
+
+    <div class="sheet"><h3>${esc(t('common.contributorCol'))}</h3>
+    <table><thead><tr><th>${esc(t('common.contributorCol'))}</th><th>Islands</th><th class="r">${esc(t('common.gross'))}</th>
+    ${anyRecoup?'<th class="r">Recoup</th>':''}${anyAdj?'<th class="r">Carried</th>':''}
+    <th class="r">${esc(t('common.net'))}</th>${before?'<th class="r">Change</th>':''}</tr></thead><tbody>
+    ${st.lines.map(l=>{const d=before?l.netCents-(before.get(l.memberId)??0):null;
+      return `<tr><td>${esc(M[l.memberId])}<span class="role">${esc(ROLES[l.memberId])}</span></td>
+      <td class="hint">${l.islands.map(i=>`${esc(i.islandName)} ${pct(i.bps)}`).join('<br>')}</td>
+      <td class="r num">${money(l.grossCents)}</td>
+      ${anyRecoup?`<td class="r num neg">${l.recoupedCents?money(-l.recoupedCents):''}</td>`:''}
+      ${anyAdj?`<td class="r num ${l.adjustmentCents<0?'neg':'pos'}">${l.adjustmentCents?money(l.adjustmentCents):''}</td>`:''}
+      <td class="r num">${money(l.netCents)}</td>
+      ${before?`<td class="r num ${d<0?'neg':d>0?'pos':''}">${d?money(d):'\u2014'}</td>`:''}</tr>`;}).join('')}
+    </tbody></table>`+totalRow(t('common.total'),st.totalNetCents)+`</div>`;
+}
+
+function viewPeriods(){
+  if(S.view.index===undefined){
+    app.innerHTML=`${whoami()}${banners()}<div class="stack">
+      <div style="margin-bottom:.4rem"><h2>${esc(t('periods.title'))}</h2></div>
+      <div class="sheet">${S.periods.map((p,i)=>`<button class="period-row" data-period="${i}">
+        <span class="period-label">${esc(p.label)}</span>
+        <span class="stamp stamp--${esc(p.state)}">${esc(p.state)}</span></button>`).join('')}</div>
+      ${isOwner()?`<div class="sheet"><h3>${esc(t('common.expenses'))}</h3>
+        ${S.expenses.length?`<table><thead><tr><th>${esc(t('common.island'))}</th><th>${esc(t('common.period'))}</th><th>What for</th>
+          <th class="r">${esc(t('common.amount'))}</th></tr></thead><tbody>
+          ${S.expenses.map(x=>`<tr><td>${esc((S.islands.find(i=>i.id===x.islandId)||{}).name||'')}</td>
+            <td class="num">${esc(x.periodLabel)}</td>
+            <td>${esc(x.description)}<span class="role">${esc(x.category)}</span></td>
+            <td class="r num">${money(x.amountCents)}</td></tr>`).join('')}</tbody></table>`
+          :`<p class="hint">${esc(t('expenses.none'))}</p>`}
+        <div class="row" style="margin-top:1.1rem">
+          <div><label for="x-isle">Island</label><select id="x-isle">
+            ${liveIslands().map(i=>`<option value="${i.id}">${esc(i.name)}</option>`).join('')}</select></div>
+          <div><label for="x-label">Period</label><input id="x-label" placeholder="2026-10" /></div>
+          <div style="flex:2"><label for="x-desc">${esc(t('common.expenses'))}</label><input id="x-desc" placeholder="Thumbnail design" /></div>
+          <div><label for="x-amt">Amount</label><input id="x-amt" class="num-input" inputmode="decimal" placeholder="0.00" /></div>
+        </div>
+        <p class="hint" style="margin:.8rem 0 0">${esc(t('expenses.deducted'))}</p>
+        <div class="actions"><button id="add-exp">${esc(t('common.expenses'))}</button></div></div>`:''}
+    </div>`;
+    document.querySelectorAll('[data-period]').forEach(el=>el.onclick=()=>{
+      S.view={index:+el.dataset.period};S.error=S.notice=null;render();});
+    const ae=document.getElementById('add-exp');
+    if(ae)ae.onclick=()=>{
+      const label=document.getElementById('x-label').value.trim();
+      const desc=document.getElementById('x-desc').value.trim();
+      const cents=toCents(document.getElementById('x-amt').value);
+      if(!/^\d{4}-\d{2}$/.test(label)){S.error='Period must look like 2026-10.';return render();}
+      if(!desc){S.error='Describe what the expense was for.';return render();}
+      if(!cents){S.error='Enter an expense amount.';return render();}
+      const per=S.periods.find(p=>p.label===label);
+      if(per&&['provisional','final'].includes(per.state)){
+        S.error=`${label} already has figures posted. Record this against an open period instead.`;return render();}
+      S.expenses.push({id:eid(),islandId:document.getElementById('x-isle').value,periodLabel:label,
+        description:desc,amountCents:cents,category:'Other'});
+      S.error=null;S.notice='Expense recorded.';render();};
+    return;
+  }
+  viewPeriod();
+}
+
+function viewPeriod(){
+  const p=S.periods[S.view.index];
+  const pending=pendingFor(p.label);
+  const inputs=(rev)=>liveIslands().map(i=>({
+    islandId:i.id,islandName:i.name,code:i.code,
+    grossCents:rev.filter(r=>r.islandId===i.id).reduce((t,r)=>t+r.amountCents,0),
+    expenseCents:expenseFor(i.id,p.label),allocations:i.allocations}));
+  let body='';
+
+  if(p.state==='draft'){
+    const exp=liveIslands().reduce((t,i)=>t+expenseFor(i.id,p.label),0);
+    body=`<p class="lede">${esc(t('periods.lockNote'))}</p>
+      ${exp?`<div class="notice">${money(exp)} of expenses will be deducted before splitting.</div>`:''}
+      ${pending.length?`<div class="notice">${pending.length} adjustment${pending.length>1?'s':''} carried in from September will apply here.</div>`:''}
+      ${isOwner()?`<div class="actions"><button class="primary" id="lock">${esc(t('periods.lock'))}</button></div>`
+                 :`<p class="hint">${esc(t('periods.ownerLocks'))}</p>`}`;
+  }
+  if(p.state==='locked'){
+    body=`<p class="lede">${esc(t('periods.lockedNote'))}</p>
+      ${isOwner()?`<div class="sheet"><h3>${esc(t('periods.postProvisional'))}</h3>${revenueInputs('pv')}
+        <div class="actions"><button class="primary" id="prov">${esc(t('periods.postProvisional'))}</button>
+        <button class="quiet" id="fp">${esc(t('periods.useExample'))}</button></div></div>`:''}`;
+  }
+  if(p.state==='provisional'||p.state==='final'){
+    const pr=p.statements.provisional,fi=p.statements.final,cur=fi||pr;
+    const delta=fi?fi.grossCents-pr.grossCents:null;
+    const rev=fi?classifyRevision(p.revenue.provisional,p.revenue.final):null;
+    body=metrics([
+      {label:t('periods.grossPayout'),value:money(cur.grossCents)},
+      {label:t('periods.distributable'),value:money(cur.distributableCents)},
+      delta===null?{label:t('periods.revision'),value:'\u2014',muted:true}
+        :{label:t('periods.revision'),value:delta===0?'\u2014':money(delta),tone:delta<0?'red':'green'},
+    ])+`<div style="margin-top:1.1rem"></div>
+      ${rev&&!rev.clean?`<div class="error">Only the engagement payout should move between estimate and
+        final. ${rev.unexpected.map(u=>`${esc(u.label)} changed by ${money(u.deltaCents)}`).join('; ')}.
+        That is almost certainly a keying error \u2014 check the figures before settling.</div>`:''}
+      <div class="sheet" style="margin-bottom:1.1rem"><h3>${esc(t('periods.revenueStreams'))}</h3>
+        <table class="kv"><tbody>${(p.revenue[fi?'final':'provisional']||[]).map(r=>
+          `<tr><td>${esc(STREAMS[r.stream].label)}<span class="role">${esc((S.islands.find(i=>i.id===r.islandId)||{}).name||'')}</span></td>
+           <td class="r num">${money(r.amountCents)}</td></tr>`).join('')}</tbody></table></div>
+      <p class="lede">${fi?`Final. Epic revised the total ${delta<0?'down':'up'} by ${money(Math.abs(delta))}.
+        Provisional credits were reversed and the settled figures booked.`
+        :t('periods.provisionalNote')}</p>
+      ${statementTable(cur,fi?pr:null)}
+      ${!fi&&isOwner()?`<div class="sheet" style="margin-top:1.1rem"><h3>${esc(t('periods.postFinal'))}</h3>${revenueInputs('fn')}
+        <div class="actions"><button class="primary" id="final">${esc(t('periods.postFinal'))}</button>
+        <button class="quiet" id="ff">${esc(t('periods.useExample'))}</button></div></div>`:''}`;
+  }
+
+  app.innerHTML=`${whoami()}${banners()}<div class="stack">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:.4rem">
+      <div><button class="quiet" id="back" style="margin-bottom:.5rem">&larr; ${esc(t('periods.allPeriods'))}</button>
+        <h2>${esc(p.label)}</h2></div>
+      <span class="stamp stamp--${esc(p.state)}">${esc(p.state)}</span></div>
+    <div>${body}</div></div>`;
+
+  document.getElementById('back').onclick=()=>{S.view={};S.error=S.notice=null;render();};
+
+  const lock=document.getElementById('lock');
+  if(lock)lock.onclick=()=>{
+    try{liveIslands().forEach(i=>resolveAllocations(i.allocations,p.label));}
+    catch(e){S.error=e.message;return render();}
+    p.state='locked';S.notice=null;render();};
+
+  const ex={pv:{engagement:[1000000,380000],in_island:[420000,88000],sac:[52000,0],sponsored:[18000,0]},
+            fn:{engagement:[962000,371000],in_island:[420000,88000],sac:[52000,0],sponsored:[18000,0]}};
+  ['fp','ff'].forEach((id,n)=>{const b=document.getElementById(id);
+    if(b)b.onclick=()=>{const pre=n?'fn':'pv';
+      liveIslands().forEach((isle,ix)=>STREAM_KEYS.forEach(k=>{
+        const el=document.getElementById(`${pre}-${isle.id}-${k}`);
+        if(el&&ex[pre][k][ix])el.value=(ex[pre][k][ix]/100).toFixed(2);}));};});
+
+  const prov=document.getElementById('prov');
+  if(prov)prov.onclick=()=>{
+    const lines=collectRevenue('pv');
+    if(!lines.length){S.error='Enter at least one figure.';return render();}
+    const adjs=pendingFor(p.label);
+    let st;try{st=buildPeriodStatement({periodId:p.label,stage:'provisional',islands:inputs(lines),
+      advances:S.advances,adjustments:adjs});}catch(e){S.error=e.message;return render();}
+    adjs.forEach(a=>{a.consumed=true;});
+    st.lines.forEach(l=>S.entries.push({id:eid(),userId:l.memberId,entryType:'credit_provisional',
+      amountCents:l.netCents,description:`Provisional share of ${p.label}`,periodLabel:p.label,
+      reference:'',effectiveAt:new Date().toISOString().slice(0,10)}));
+    p.statements.provisional=st;p.revenue.provisional=lines;p.state='provisional';
+    S.error=null;render();};
+
+  const fin=document.getElementById('final');
+  if(fin)fin.onclick=()=>{
+    const lines=collectRevenue('fn');
+    if(!lines.length){S.error='Enter at least one figure.';return render();}
+    let st;try{st=buildPeriodStatement({periodId:p.label,stage:'final',islands:inputs(lines),
+      advances:S.advances,
+      adjustments:p.statements.provisional.lines.filter(l=>l.adjustmentCents)
+        .map(l=>({memberId:l.memberId,amountCents:l.adjustmentCents}))});}
+    catch(e){S.error=e.message;return render();}
+
+    S.entries.filter(e=>e.periodLabel===p.label&&e.entryType==='credit_provisional')
+      .forEach(e=>S.entries.push({id:eid(),userId:e.userId,entryType:'credit_reversal',
+        amountCents:-e.amountCents,description:`Reversal of provisional estimate for ${p.label}`,
+        periodLabel:p.label,reference:'',effectiveAt:new Date().toISOString().slice(0,10)}));
+    st.lines.forEach(l=>S.entries.push({id:eid(),userId:l.memberId,entryType:'credit_final',
+      amountCents:l.netCents,description:`Final share of ${p.label}`,periodLabel:p.label,
+      reference:'',effectiveAt:new Date().toISOString().slice(0,10)}));
+    st.recoupApplied.forEach(a=>{const adv=S.advances.find(x=>x.id===a.advanceId);
+      if(adv)adv.outstandingCents=Math.max(0,adv.outstandingCents-a.appliedCents);});
+
+    const[y,m]=p.label.split('-').map(Number);
+    const next=`${m===12?y+1:y}-${String(m===12?1:m+1).padStart(2,'0')}`;
+    reconcile(p.statements.provisional,st,next).adjustments
+      .forEach(a=>S.adjustments.push({...a,carryTo:next,consumed:false}));
+    if(!S.periods.some(x=>x.label===next))
+      S.periods.push({label:next,state:'draft',statements:{},revenue:{}});
+
+    p.statements.final=st;p.revenue.final=lines;p.state='final';
+    S.error=null;S.notice=`Credits booked. Adjustments carried into ${next}.`;render();};
+}
+
+/* ============================================================ *
+ * Bank, P&L, People, Discord
+ * ============================================================ */
+function viewBank(){
+  if(!isOwner()){app.innerHTML=`${whoami()}<div class="sheet"><h3>${esc(t('bank.title'))}</h3>
+    <p class="hint" style="margin:0">${esc(t('bank.ownerOnly'))}</p></div>`;return;}
+  const unmatchedRows=S.bank.filter(b=>!b.matchedId);
+  const matchedIds=new Set(S.bank.map(b=>b.matchedId).filter(Boolean));
+  const unmatchedPays=payments().filter(p=>!matchedIds.has(p.id));
+  const nameFor=id=>{const p=payments().find(x=>x.id===id);return p?M[p.userId]:'\u2014';};
+
+  app.innerHTML=`${whoami()}${banners()}<div class="stack">
+    <div style="margin-bottom:.4rem"><h2>${esc(t('bank.title'))}</h2>
+      <p class="hint" style="margin:.2rem 0 0">${esc(t('bank.subtitle'))}</p></div>
+    ${metrics([
+      {label:t('bank.lines'),value:String(S.bank.length)},
+      {label:t('bank.matched'),value:String(S.bank.length-unmatchedRows.length),tone:'green'},
+      {label:t('bank.unexplained'),value:String(unmatchedRows.length+unmatchedPays.length),
+       tone:(unmatchedRows.length+unmatchedPays.length)?'amber':null,
+       muted:!(unmatchedRows.length+unmatchedPays.length)},
+    ])}
+    <div class="sheet"><h3>${esc(t('bank.imported'))}</h3>
+      <table><thead><tr><th>${esc(t('common.date'))}</th><th>Description</th><th class="r">${esc(t('common.amount'))}</th><th class="r">${esc(t('bank.matchedTo'))}</th></tr></thead>
+      <tbody>${S.bank.map(b=>`<tr><td class="num">${esc(b.date)}</td>
+        <td>${esc(b.description)}${b.reference?`<span class="role">${esc(b.reference)}</span>`:''}</td>
+        <td class="r num neg">${money(b.amountCents)}</td>
+        <td class="r">${b.matchedId?`<span class="stamp stamp--final">${esc(nameFor(b.matchedId))}</span>`
+          :`<span class="stamp stamp--provisional">${esc(t('bank.unmatched'))}</span>`}</td></tr>`).join('')}
+      </tbody></table>
+      <div class="actions"><button id="rerun">${esc(t('bank.rerun'))}</button></div></div>
+    ${unmatchedRows.length?`<div class="sheet"><h3>${esc(t('bank.inBankNotRecorded'))}</h3>
+      <table><tbody>${unmatchedRows.map(b=>`<tr><td>${esc(b.description)}</td>
+        <td class="r num neg">${money(b.amountCents)}</td></tr>`).join('')}</tbody></table>
+      <p class="hint" style="margin:.9rem 0 0">${esc(t('bank.moneyLeft'))}</p></div>`:''}
+    ${unmatchedPays.length?`<div class="sheet"><h3>${esc(t('bank.recordedNotInBank'))}</h3>
+      <table><tbody>${unmatchedPays.map(p=>`<tr><td>${esc(M[p.userId])}</td>
+        <td class="r num">${money(Math.abs(p.amountCents))}</td></tr>`).join('')}</tbody></table></div>`:''}
+  </div>`;
+  document.getElementById('rerun').onclick=()=>{
+    const r=matchBank(S.bank,payments());
+    S.notice=`Examined ${r.examined} lines, matched ${r.matched}.`;render();};
+}
+
+function viewPnl(){
+  if(!isOwner()){app.innerHTML=`${whoami()}<div class="sheet"><h3>${esc(t('pnl.title'))}</h3>
+    <p class="hint" style="margin:0">${esc(t('pnl.ownerOnly'))}</p></div>`;return;}
+  const finals=S.periods.filter(p=>p.state==='final');
+  const byStream={},byIsland={},byCat={};
+  finals.forEach(p=>(p.revenue.final||[]).forEach(r=>{
+    byStream[r.stream]=(byStream[r.stream]||0)+r.amountCents;
+    const n=(S.islands.find(i=>i.id===r.islandId)||{}).name||'?';
+    byIsland[n]=(byIsland[n]||0)+r.amountCents;}));
+  S.expenses.forEach(x=>{byCat[x.category]=(byCat[x.category]||0)+x.amountCents;});
+  const revenue=Object.values(byStream).reduce((a,b)=>a+b,0);
+  const expense=Object.values(byCat).reduce((a,b)=>a+b,0);
+
+  app.innerHTML=`${whoami()}${banners()}<div class="stack">
+    <div style="margin-bottom:.4rem"><h2>${esc(t('pnl.title'))}</h2>
+      <p class="hint" style="margin:.2rem 0 0">${esc(t('pnl.subtitle'))}</p></div>
+    ${metrics([
+      {label:t('pnl.revenue'),value:money(revenue)},
+      {label:t('common.expenses'),value:money(expense),tone:expense?'red':null},
+      {label:t('pnl.net'),value:money(revenue-expense),tone:revenue-expense>=0?'green':'red'},
+    ])}
+    <div class="sheet"><h3>${esc(t('pnl.byIsland'))}</h3>
+      <table><tbody>${Object.entries(byIsland).sort((a,b)=>b[1]-a[1]).map(([k,v])=>
+        `<tr><td>${esc(k)}</td><td class="r num">${money(v)}</td>
+         <td class="r hint" style="width:4rem">${((v/revenue)*100).toFixed(0)}%</td></tr>`).join('')}
+      </tbody></table></div>
+    <div class="sheet"><h3>${esc(t('pnl.byStream'))}</h3>
+      <table><tbody>${Object.entries(byStream).sort((a,b)=>b[1]-a[1]).map(([k,v])=>
+        `<tr><td>${esc(STREAMS[k].label)}</td><td class="r num">${money(v)}</td></tr>`).join('')}
+      </tbody></table>${totalRow(t('pnl.revenue'),revenue)}</div>
+    <div class="sheet"><h3>${esc(t('pnl.byCategory'))}</h3>
+      ${!expense?`<p class="hint" style="margin:0">${esc(t('expenses.none'))}</p>`:
+      `<table><tbody>${Object.entries(byCat).sort((a,b)=>b[1]-a[1]).map(([k,v])=>
+        `<tr><td>${esc(k)}</td><td class="r num neg">${money(v)}</td></tr>`).join('')}
+      </tbody></table>${totalRow(t('common.expenses'),expense)}`}</div>
+  </div>`;
+}
+
+function viewPeople(){
+  const openShare=k=>S.islands.some(i=>i.allocations.some(a=>a.memberId===k&&!a.toLabel));
+  app.innerHTML=`${whoami()}${banners()}<div class="stack">
+    <div style="margin-bottom:.4rem"><h2>${esc(t('people.title'))}</h2></div>
+    <div class="sheet"><h3>${esc(t('people.team'))}</h3>
+      <table><thead><tr><th>${esc(t('common.contributorCol'))}</th><th>${esc(t('people.role'))}</th><th class="r">${esc(t('common.balance'))}</th>${isOwner()?'<th></th>':''}</tr></thead>
+      <tbody>${Object.keys(M).map(k=>`<tr${S.active[k]?'':' style="opacity:.5"'}>
+        <td>${esc(M[k])}<span class="role">${esc(ROLES[k])}${S.active[k]?'':' · offboarded'}</span></td>
+        <td>${esc(S.roles[k])}</td><td class="r num">${money(balanceOf(k))}</td>
+        ${isOwner()?`<td class="r">${S.active[k]?`
+          <button class="quiet" data-role="${k}">${S.roles[k]==='owner'?'Demote':'Make owner'}</button>
+          <button class="quiet" data-off="${k}">${esc(t('people.offboard'))}</button>`:''}</td>`:''}</tr>`).join('')}
+      </tbody></table>
+      <p class="hint" style="margin:.9rem 0 0">${esc(t('people.offboardRules'))}</p></div>
+    ${isOwner()?`<div class="sheet"><h3>${esc(t('people.invite'))}</h3>
+      <p class="hint" style="margin:0 0 .9rem">${esc(t('people.inviteNote'))}</p>
+      <div class="row"><div style="flex:2"><label for="i-email">${esc(t('people.email'))}</label>
+        <input id="i-email" placeholder="new@example.com" /></div></div>
+      <div class="actions"><button class="primary" id="do-invite">${esc(t('people.createInvite'))}</button></div>
+      <div id="invite-out"></div></div>`:''}
+  </div>`;
+
+  document.querySelectorAll('[data-role]').forEach(el=>el.onclick=()=>{
+    const k=el.dataset.role;
+    if(S.roles[k]==='owner'){
+      if(Object.keys(S.roles).filter(x=>S.roles[x]==='owner'&&S.active[x]).length<=1){
+        S.error='That is the only owner. Promote someone else first.';return render();}
+      S.roles[k]='contributor';S.notice=`${M[k]} is now a contributor.`;
+    }else{S.roles[k]='owner';S.notice=`${M[k]} is now an owner.`;}
+    S.error=null;render();});
+
+  document.querySelectorAll('[data-off]').forEach(el=>el.onclick=()=>{
+    const k=el.dataset.off,bal=balanceOf(k);
+    if(bal>0){S.error=`${M[k]} is still owed ${money(bal)}. Settle up before offboarding.`;return render();}
+    if(bal<0){S.error=`${M[k]} has been overpaid by ${money(Math.abs(bal))}.`;return render();}
+    if(openShare(k)){S.error='They still hold an open-ended share on at least one island. End it first.';return render();}
+    S.active[k]=false;S.error=null;S.notice=`${M[k]} offboarded. Their record stays on the ledger.`;render();});
+
+  const inv=document.getElementById('do-invite');
+  if(inv)inv.onclick=()=>{
+    const email=document.getElementById('i-email').value.trim();
+    if(!/^[^@\s]+@[^@\s]+$/.test(email)){S.error='Enter a valid email address.';return render();}
+    const token=Array.from({length:16},()=>Math.random().toString(36)[2]).join('');
+    S.invites.push({email,token});S.error=null;render();
+    document.getElementById('invite-out').innerHTML=
+      `<div style="margin-top:1.1rem;padding-top:1.1rem;border-top:1px solid var(--border-2)">
+        <p class="hint" style="margin:0 0 .5rem">${esc(t('people.inviteLink'))}</p>
+        <div style="font-family:ui-monospace,monospace;font-size:.8rem;word-break:break-all;
+          background:var(--card-2);padding:.7rem .8rem;border-radius:10px;color:var(--text-2)">
+          https://your-host/invite/${esc(token)}</div></div>`;};
+}
+
+
+function volumeByMonth(){
+  const out={};
+  S.periods.filter(p=>p.state==='final').forEach(p=>{
+    out[p.label]=(p.revenue.final||[]).reduce((t,r)=>t+r.amountCents,0);});
+  return out;
+}
+
+function viewBilling(){
+  const band=bandFor(volumeByMonth());
+  const e=entitlements(S.subscription,band);
+  const plan=PLAN_BY_KEY[e.currentPlan],needed=PLAN_BY_KEY[e.requiredPlan];
+
+  if(!isOwner()){
+    app.innerHTML=`${whoami()}<div class="stack">
+      <div style="margin-bottom:.4rem"><h2>${esc(t('billing.title'))}</h2></div>
+      <div class="sheet"><h3>${esc(t('billing.title'))}</h3>
+        <p class="hint" style="margin:0">${e.canPostFigures
+          ? t('billing.nothingToDo')
+          : t('billing.contributorNote')}</p>
+      </div></div>`;
+    return;
+  }
+
+  app.innerHTML=`${whoami()}${banners()}<div class="stack">
+    <div style="margin-bottom:.4rem"><h2>${esc(t('billing.title'))}</h2>
+      <p class="hint" style="margin:.2rem 0 0">${esc(t('billing.subtitle'))}</p></div>
+
+    ${metrics([
+      {label:t('billing.trailingAverage'),value:money(band.averageMonthlyCents)},
+      {label:t('billing.currentPlan'),value:plan.label},
+      {label:t('billing.monthlyCost'),value:plan.priceCents?money(plan.priceCents):t('billing.free'),
+       muted:!plan.priceCents},
+    ])}
+
+    ${!e.canPostFigures?`<div class="error">${esc(e.reason)}</div>`
+      :e.inGrace?`<div class="notice">${esc(e.reason)}</div>`:''}
+
+    <div class="sheet"><h3>${esc(t('billing.plans'))}</h3>
+      <table><thead><tr><th>${esc(t('billing.currentPlan'))}</th><th class="r">${esc(t('billing.upTo'))}</th><th class="r">${esc(t('billing.price'))}</th><th></th></tr></thead>
+      <tbody>${PLANS.map(p=>`<tr${p.key===e.currentPlan?' style="font-weight:500"':''}>
+        <td>${esc(p.label)}<span class="role">${esc(p.blurb)}</span></td>
+        <td class="r num">${p.maxMonthlyCents===Infinity?t('billing.noLimit'):money(p.maxMonthlyCents)+'/mo'}</td>
+        <td class="r num">${p.priceCents?money(p.priceCents)+'/mo':t('billing.free')}</td>
+        <td class="r">${p.key===e.currentPlan?`<span class="stamp stamp--final">${esc(t('billing.current'))}</span>`
+          :`<button class="quiet" data-plan="${p.key}">${esc(t('billing.choose'))}</button>`}</td></tr>`).join('')}
+      </tbody></table></div>
+
+    <div class="sheet"><h3>${esc(t('billing.trailingAverage'))}</h3>
+      ${Object.keys(volumeByMonth()).length
+        ? `<table><tbody>${Object.entries(volumeByMonth()).map(([l,c])=>
+            `<tr><td class="num">${esc(l)}</td><td class="r num">${money(c)}</td></tr>`).join('')}
+           </tbody></table>`
+        : `<p class="hint" style="margin:0">${esc(t('pnl.noFinal'))}</p>`}
+      <p class="hint" style="margin:.9rem 0 0">${esc(t('billing.onlyFinal'))}</p></div>
+
+    <div class="sheet"><h3>${esc(t('billing.neverGated'))}</h3>
+      <table class="kv"><tbody>
+        <tr><td>${esc(t('billing.readOwn'))}</td><td class="r pos">${esc(t('billing.alwaysFree'))}</td></tr>
+        <tr><td>${esc(t('billing.exportOwn'))}</td><td class="r pos">${esc(t('billing.alwaysFree'))}</td></tr>
+        <tr><td>${esc(t('billing.everyContributor'))}</td><td class="r pos">${esc(t('billing.alwaysFree'))}</td></tr>
+        <tr><td>${esc(t('billing.postFigures'))}</td><td class="r hint">${esc(t('billing.needsBand'))}</td></tr>
+      </tbody></table>
+      <p class="hint" style="margin:.9rem 0 0">${esc(t('billing.neverGatedNote'))}</p></div>
+  </div>`;
+
+  document.querySelectorAll('[data-plan]').forEach(el=>el.onclick=()=>{
+    const target=PLAN_BY_KEY[el.dataset.plan];
+    if(target.priceCents<PLAN_BY_KEY[band.requiredPlan].priceCents){
+      S.error=`Your trailing average is ${money(band.averageMonthlyCents)} a month, which needs `
+        +`${PLAN_BY_KEY[band.requiredPlan].label}. Downgrading would pause posting straight away.`;
+      return render();}
+    S.subscription={plan:target.key,status:'active',graceEndsAt:null};
+    S.error=null;S.notice=`Now on ${target.label}.`;render();});
+}
+
+
+function viewDiscord(){
+  const bal=balanceOf(S.you);
+  app.innerHTML=`${whoami()}${banners()}<div class="stack">
+    <div style="margin-bottom:.4rem"><h2>${esc(t('nav.discord'))}</h2>
+      <p class="hint" style="margin:.2rem 0 0">${esc(t('discord.subtitle'))}</p></div>
+    <div class="sheet"><h3>${esc(t('nav.discord'))}</h3>
+      <p class="hint" style="margin:0 0 .9rem">${esc(t('discord.ephemeral'))}</p>
+      <div style="font-family:ui-monospace,monospace;font-size:.82rem;background:var(--card-2);
+        padding:.9rem 1rem;border-radius:10px;line-height:1.7;color:var(--text-2)">
+        <div style="color:var(--text)">/ledger balance</div>
+        <div style="margin-top:.5rem">${esc(S.team.name)} &mdash; ${esc(M[S.you])}<br>
+        ${esc(t('discord.owedToYou'))} <span style="color:var(--text)">${money(bal)}</span><br>
+        Islands: ${S.islands.filter(i=>i.allocations.some(a=>a.memberId===S.you))
+          .map(i=>`${esc(i.name)} ${pct(i.allocations.find(a=>a.memberId===S.you).bps)}`).join(', ')||'none'}</div>
+      </div></div>
+    <div class="sheet"><h3>${esc(t('discord.setup'))}</h3>
+      <table class="kv"><tbody>
+        <tr><td>1. ${esc(t('discord.step1'))}</td><td class="r hint">discord.com/developers</td></tr>
+        <tr><td>2. ${esc(t('discord.step2'))}</td><td class="r hint">PUBLIC_KEY, BOT_TOKEN</td></tr>
+        <tr><td>3. ${esc(t('discord.step3'))}</td><td class="r hint">/api/discord</td></tr>
+        <tr><td>4. ${esc(t('discord.step4'))}</td><td class="r hint">scripts/register-commands.js</td></tr>
+      </tbody></table>
+      <p class="hint" style="margin:.9rem 0 0">${esc(t('discord.httpNote'))}</p></div>
+  </div>`;
+}
+
+/* ============================================================ *
+ * Router
+ * ============================================================ */
+function render(){
+  meta.innerHTML=`${esc(S.team.name)} &nbsp;·&nbsp; ${esc(M[S.you])}`;
+  var sel=document.getElementById('lang-select');
+  if(sel)sel.innerHTML=Object.keys(LOCALES).map(function(c){
+    return '<option value="'+c+'"'+(c===LANG?' selected':'')+'>'+LOCALES[c].label+'</option>';}).join('');
+  var tt=document.getElementById('theme-toggle');
+  if(tt)tt.querySelectorAll('[data-theme-set]').forEach(function(b){
+    b.textContent=t('theme.'+b.dataset.themeSet);});
+  renderTabs();
+  ({islands:viewIslands,account:viewAccount,periods:viewPeriods,bank:viewBank,
+    pnl:viewPnl,people:viewPeople,billing:viewBilling,discord:viewDiscord}[S.tab]||viewIslands)();
+  var langSel=document.getElementById('lang-select');
+  if(langSel)langSel.onchange=function(){ setLang(this.value); };
+  document.querySelectorAll('[data-who]').forEach(el=>el.onclick=()=>{
+    S.you=el.dataset.who;S.error=S.notice=null;S.view={};render();});
+}
+render();
+</script>
+<script>
+/**
+ * Theme control. Three states rather than two: someone who has not chosen
+ * should keep following their system, and a binary toggle quietly takes
+ * that away the first time it is clicked.
+ */
+(function(){
+  var root=document.documentElement;
+  var group=document.getElementById('theme-toggle');
+  if(!group)return;
+
+  function current(){ return root.getAttribute('data-theme') || 'system'; }
+
+  function paint(){
+    var now=current();
+    group.querySelectorAll('[data-theme-set]').forEach(function(b){
+      b.setAttribute('aria-pressed', String(b.dataset.themeSet===now));
+    });
+  }
+
+  group.addEventListener('click', function(e){
+    var button=e.target.closest('[data-theme-set]');
+    if(!button)return;
+    var choice=button.dataset.themeSet;
+    if(choice==='system'){
+      root.removeAttribute('data-theme');
+      try{ localStorage.removeItem('isola-theme'); }catch(err){}
+    }else{
+      root.setAttribute('data-theme',choice);
+      try{ localStorage.setItem('isola-theme',choice); }catch(err){}
+    }
+    paint();
+  });
+
+  paint();
+})();
+</script>
+</body>
+</html>
