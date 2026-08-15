@@ -31,6 +31,10 @@
 
   nav { display:flex; align-items:center; justify-content:space-between;
         padding:1.25rem 0; gap:1rem; flex-wrap:wrap; }
+.mark-icon { width: 1.05em; height: 1.05em; flex: none; }
+  .mark, .wordmark { display: inline-flex; align-items: center; gap: .45rem; }
+  a.wordmark { text-decoration: none; color: inherit; }
+  a.wordmark:hover { opacity: .75; }
   .mark { font-weight:600; font-size:1.05rem; letter-spacing:-.01em; text-decoration:none; }
   nav .links { display:flex; gap:1.25rem; align-items:center; font-size:.9rem; }
   nav a.quiet { color:var(--text-2); text-decoration:none; }
