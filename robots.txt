@@ -1,0 +1,28 @@
+# Isola — rev-share bookkeeping for creator teams
+# https://isola.gg
+
+User-agent: *
+Allow: /
+
+# The app is behind a login and its pages are per-team. Crawling them
+# reaches a sign-in screen every time, which wastes a crawl budget and
+# indexes nothing useful.
+Disallow: /app
+Disallow: /books/
+Disallow: /invite/
+
+# Answer engines. Named explicitly rather than left to the wildcard so the
+# permission is a decision on the record rather than an oversight.
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://isola.gg/sitemap.xml

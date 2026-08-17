@@ -1,0 +1,86 @@
+# Isola
+
+> Rev-share bookkeeping for creator teams on Fortnite, Roblox, Minecraft and FiveM. Keeps a payout record every collaborator can see and nobody — including the owner — can quietly edit.
+
+Isola is a web application at https://app.isola.gg. A working demo that needs no account runs at https://isola.gg/demo.
+
+## The problem it solves
+
+A creator team publishes something, the platform pays one account, and one person then splits the money by hand. Two things go wrong.
+
+**Estimates get revised.** Platforms post a provisional figure and settle a different one weeks later. When the final number is lower, the person who already told everyone what they earned has to walk it back.
+
+**Spreadsheets get edited.** A shared sheet has no history anyone can trust. When a figure changes, there is no way to show it was not changed quietly.
+
+## How it works
+
+1. A split is agreed per place, not per team, because collaborators differ on each one. Shares are in basis points and must total exactly 100%.
+2. Every named contributor approves the split before a period can be locked. Nobody sets their own share.
+3. The owner posts the platform's provisional figures, then the final ones.
+4. Each contributor sees their own statement: a running balance, what has been paid, and a CSV export.
+
+When a final figure differs from the estimate, the provisional credit is reversed and replaced rather than edited, and the difference carries into the next month. **Nobody is ever asked to send money back.**
+
+## What makes it different
+
+**It never touches the money.** The platform pays the owner, the owner pays the team through their own bank, and Isola keeps the record. There is no float, no custody, and no cut of the payout.
+
+**The record is append-only.** Statements are frozen when posted, so a September statement reads identically in December. Every split version, approval, figure and payment is recorded with who did it and when. Nothing can be removed.
+
+**Anyone on the team can verify the books balance**, not just the owner. The check confirms each person's stated balance equals their own entries, each period accounted for exactly what it took in, and every provisional estimate was reversed exactly once. It reports and never repairs.
+
+**It knows which revenue streams settle in two stages.** Engagement-type payouts move between estimate and final; game passes, in-island purchases and store sales do not. So a change to a fixed stream is flagged as a probable keying error rather than accepted silently.
+
+## Platforms
+
+| Platform | A place is called | Revenue streams |
+| --- | --- | --- |
+| Fortnite | Island | Engagement payout, in-island transactions, Support-a-Creator, sponsored row |
+| Roblox | Experience | Engagement payout, game passes, developer products, Premium payouts, paid access |
+| Minecraft | Server or map | Marketplace sales, Character Creator items, server store, subscriptions |
+| FiveM | Server | Store sales, donations, subscriptions, asset sales |
+
+A team can run places on more than one platform and keep one set of books.
+
+## Pricing
+
+Priced on the volume a team handles, not on how many people are added. Charging per collaborator would penalise adding the people whose visibility is the point.
+
+| Plan | Price | Monthly volume |
+| --- | --- | --- |
+| Free | £0 | Up to $2,000 |
+| Starter | $39/mo | Up to $25,000 |
+| Studio | $89/mo | Up to $100,000 |
+| Pro | $199/mo | No limit |
+
+Yearly billing is ten months charged for twelve — a 17% discount on every plan.
+
+**Every feature is on every plan.** No feature sits behind a higher tier. What paid plans add is owner convenience at scale: scheduled statements, a year-end pack, automatic exchange rates, unlimited accountant links, read-only API access and extra Discord commands.
+
+**Reading and exporting your own records is free on every plan and always will be.** A bookkeeping tool that locks people out of their own records over an invoice has stopped being worth trusting.
+
+## Also included on every plan
+
+- An account for every contributor
+- Read-only books access for an accountant, with no account needed
+- A full snapshot export of everything, for a year end or a dispute
+- Bank reconciliation against your own statement
+- Expenses and recoupable advances
+- Profit and loss across places and streams
+- A Discord bot for checking balances and approving splits in chat
+- Six languages: English, Spanish, Brazilian Portuguese, French, German, Japanese
+
+## Facts
+
+- Money is stored as integer cents; splits use largest-remainder so parts always sum to the whole
+- Exchange rates are fixed at the posting date and cannot be changed afterwards
+- Isola is a record-keeping tool, not an accountant, and nothing in it is financial advice
+- Not affiliated with Epic Games, Roblox Corporation, Mojang or Cfx.re
+
+## Links
+
+- Home: https://isola.gg
+- Demo, no account needed: https://isola.gg/demo
+- Application: https://app.isola.gg
+- Terms: https://isola.gg/terms
+- Privacy: https://isola.gg/privacy
