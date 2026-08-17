@@ -70,6 +70,49 @@ Yearly billing is ten months charged for twelve — a 17% discount on every plan
 - A Discord bot for checking balances and approving splits in chat
 - Six languages: English, Spanish, Brazilian Portuguese, French, German, Japanese
 
+## Using it
+
+**Adding the Discord bot.** Open your team, go to the Discord tab, and press
+Link Discord. You get a code, then run `/link` with it in any server the bot
+is in. The code expires in 15 minutes and works once. If the bot is not in
+your server yet, an owner adds it from the link on the Discord tab — it needs
+permission to read and send messages in the channels you want it in.
+
+**Discord commands.** `/help` explains the rest and works before you have
+linked anything. `/balance` shows what you are owed. `/statement` shows how it
+got there. `/approve` signs off a split waiting on you. `/period` shows where
+this month has got to. `/split` shows what your team agreed. `/check` confirms
+the books balance and anyone can run it. `/chase` reminds whoever has not
+approved, and is owner-only. `/owed`, `/pnl` and `/studio` are owner
+conveniences on paid plans.
+
+**Adding a place.** Islands tab, Add a place. Choose the platform, give it a
+name, and add the code players use to find it if your platform has one.
+Minecraft and FiveM have no player-facing code, so that field is optional
+there.
+
+**Why a period will not lock.** Every named contributor has to approve the
+split first, and every live place needs an agreed split. The message names who
+is still outstanding.
+
+**Why a figure was refused.** Revenue streams belong to a platform. A Roblox
+game pass figure posted against a Fortnite island is refused, because the two
+platforms reconcile differently.
+
+**Importing figures.** Periods tab, Import figures. Paste the payout export
+from your platform. It shows what it read and what it could not, and nothing
+is recorded until you choose to.
+
+**Inviting people.** People tab. They get a link, set their own password, and
+nobody else ever sees it. Everyone gets an account on every plan.
+
+**Giving an accountant access.** People tab, Access. Creates a read-only link
+that needs no account and can be revoked instantly. It never shows an
+individual contributor's balance.
+
+**Getting paid out.** Isola never moves money. It records what is owed; you
+pay through your own bank and record the payment.
+
 ## Facts
 
 - Money is stored as integer cents; splits use largest-remainder so parts always sum to the whole
