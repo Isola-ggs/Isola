@@ -166,3 +166,42 @@
   .chat .btns .yes { background: var(--green-bg); color: var(--green); }
   .chat .btns .no  { background: var(--card-2); color: var(--text-3);
                      border: 1px solid var(--border); }
+
+
+/* Platform strip. The four names sit directly under the hero because the
+   product supporting more than Fortnite is the thing a Roblox developer
+   needs to see before they decide the page is not for them. */
+.platforms {
+  display: flex; flex-wrap: wrap; gap: .45rem;
+  margin: 1.1rem 0 0;
+}
+.platforms li {
+  list-style: none;
+  display: inline-flex; align-items: center; gap: .4rem;
+  padding: .3rem .75rem; border-radius: 999px;
+  border: 1px solid var(--border-2); background: var(--card);
+  font-size: .85rem; font-weight: 500;
+}
+.platforms li span {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--green);
+}
+.platform-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: .9rem; margin-top: 1.2rem;
+}
+.platform-card {
+  border: 1px solid var(--border); border-radius: 12px;
+  padding: 1rem 1.1rem; background: var(--card);
+}
+.platform-card h4 {
+  margin: 0 0 .15rem; font-size: 1rem; letter-spacing: -.01em;
+}
+.platform-card .what {
+  font-size: .82rem; color: var(--muted); margin: 0 0 .7rem;
+}
+.platform-card ul { margin: 0; padding: 0; list-style: none; }
+.platform-card li {
+  font-size: .82rem; color: var(--muted);
+  padding: .18rem 0; display: flex; gap: .45rem; align-items: baseline;
+}
+.platform-card li::before { content: '·'; color: var(--border-2); }
