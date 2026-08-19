@@ -65,6 +65,9 @@ Yearly billing is ten months charged for twelve — a 17% discount on every plan
 - Read-only books access for an accountant, with no account needed
 - A full snapshot export of everything, for a year end or a dispute
 - Bank reconciliation against your own statement
+- Payment files for your bank, in four formats
+- Opening balances, so a team with history can start without losing it
+- Excel, CSV and JSON exports of everything, with a date range
 - Expenses and recoupable advances
 - Profit and loss across places and streams
 - A Discord bot for checking balances and approving splits in chat
@@ -82,9 +85,15 @@ permission to read and send messages in the channels you want it in.
 linked anything. `/balance` shows what you are owed. `/statement` shows how it
 got there. `/approve` signs off a split waiting on you. `/period` shows where
 this month has got to. `/split` shows what your team agreed. `/check` confirms
-the books balance and anyone can run it. `/chase` reminds whoever has not
-approved, and is owner-only. `/owed`, `/pnl` and `/studio` are owner
-conveniences on paid plans.
+the books balance and anyone can run it, not just the owner. `/share` gives a
+link to add Isola to another server. `/here` sets the current channel for team
+updates, `/chase` reminds whoever has not approved, and `/upgrade` shows your
+plan — all owner-only. `/owed`, `/pnl` and `/studio` are owner conveniences on
+paid plans.
+
+Isola posts to that channel when a month is estimated and when it settles,
+naming the team total and never an individual share. It also posts when a
+split has been waiting on somebody for more than three days.
 
 **Adding a place.** Islands tab, Add a place. Choose the platform, give it a
 name, and add the code players use to find it if your platform has one.
@@ -112,6 +121,30 @@ individual contributor's balance.
 
 **Getting paid out.** Isola never moves money. It records what is owed; you
 pay through your own bank and record the payment.
+
+**Paying everyone at once.** Money tab, Pay everyone at once. Isola produces a
+file listing what each person is owed, which you upload to your own bank
+instead of typing every transfer by hand. Four formats: CSV for most banks
+anywhere, NACHA ACH for the United States, SEPA pain.001 for the eurozone, and
+ABA for Australia. The file contains no bank account details — Isola has never
+asked for a sort code or routing number and does not store them. Nothing is
+paid until you upload the file and authorise it yourself.
+
+**Starting with history.** If your team was already splitting revenue before
+Isola, record what each person was owed on the day you started, under People.
+It can only be set once and only before any figures are posted, because an
+opening balance is a starting point rather than an adjustment.
+
+**Deleting things.** You can delete your account from the account screen: your
+name, email, password and linked accounts are destroyed, while your figures
+stay on the team's books without your name on them, because the team's accounts
+only reconcile when everyone's figures are present. An owner can delete a whole
+team, but not while anybody is still owed money.
+
+**Exports.** The general ledger, reconciliation, statement of account and
+earnings summary all download as Excel, CSV or JSON, with a date range. Excel
+is the one to give an accountant: a CSV gets guessed at, so a reference like
+007 becomes 7 and a leading equals sign runs as a formula.
 
 ## Facts
 

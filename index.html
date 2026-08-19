@@ -77,8 +77,11 @@
         "Provisional and final figures reconciled automatically",
         "Statement of account readable and exportable by each person",
         "Books integrity check any team member can run",
+        "Payment files for your bank in CSV, NACHA, SEPA and ABA formats",
+        "Excel, CSV and JSON exports with a date range, for your accountant",
+        "Opening balances, so a team with existing history can adopt it",
         "Bank reconciliation, expenses and recoupable advances",
-        "Read-only books access for an accountant"
+        "A Discord bot that posts when a month settles and nudges on approvals"
       ]
     },
     {
@@ -146,6 +149,30 @@
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "No feature is. Paid plans add owner convenience at scale \u2014 scheduled statements, a year-end pack, automatic exchange rates and API access. Reading and exporting your own records is free on every plan and always will be."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can Isola pay my team for me?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No, and it never will. Isola produces a file listing what each person is owed, which you upload to your own bank and authorise yourself. Four formats are supported: CSV for most banks, NACHA for the United States, SEPA for the eurozone and ABA for Australia. The file contains no bank account details."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I move an existing team onto Isola?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Record what each person was owed on the day you start, and the books begin from there rather than pretending nobody is owed anything. It can only be set once, and only before any figures are posted."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What can I send my accountant?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A general ledger of every transaction chronologically, and a reconciliation showing opening, recognised, paid and closing figures per person. Both take a date range and download as Excel, CSV or JSON. Both are available on the read-only link you give your accountant, so they do not have to ask you."
           }
         }
       ]
@@ -368,7 +395,7 @@
             <td class="r">$2,000</td><td class="r">Free</td></tr>
         <tr><td class="name">Starter<span class="blurb">Splitting real money every month</span></td>
             <td class="r">$25,000</td><td class="r">$39</td></tr>
-        <tr><td class="name">Studio<span class="blurb">Several islands, bank reconciliation</span></td>
+        <tr><td class="name">Studio<span class="blurb">Several places, bank reconciliation</span></td>
             <td class="r">$100,000</td><td class="r">$89</td></tr>
         <tr><td class="name">Pro<span class="blurb">Top of the Discover charts</span></td>
             <td class="r">no limit</td><td class="r">$199</td></tr>
@@ -442,12 +469,16 @@
         <li style="break-inside:avoid"><span>Statement of account, readable and exportable by each person</span></li>
         <li style="break-inside:avoid"><span>Bank reconciliation against your own statement</span></li>
         <li style="break-inside:avoid"><span>Expenses and recoupable advances</span></li>
-        <li style="break-inside:avoid"><span>Profit and loss across islands and streams</span></li>
+        <li style="break-inside:avoid"><span>Profit and loss across places and streams</span></li>
         <li style="break-inside:avoid"><span>Read-only books access for your accountant</span></li>
         <li style="break-inside:avoid"><span>A full snapshot export, for a year end or a dispute</span></li>
         <li style="break-inside:avoid"><span>Reusable split templates and approval deadlines</span></li>
         <li style="break-inside:avoid"><span>The Discord bot: balance, statement and approvals in chat</span></li>
         <li style="break-inside:avoid"><span>Notifications when a period is posted</span></li>
+        <li style="break-inside:avoid"><span>Payment files for your bank &mdash; CSV, NACHA, SEPA or ABA</span></li>
+        <li style="break-inside:avoid"><span>Opening balances, so a team with history keeps it</span></li>
+        <li style="break-inside:avoid"><span>A books check anyone on the team can run</span></li>
+        <li style="break-inside:avoid"><span>Excel, CSV and JSON exports with a date range</span></li>
       </ul>
     </div>
 
@@ -534,6 +565,18 @@
     <div class="card" style="margin-top:1rem">
       <h3>Is anything locked behind a paid plan?</h3>
       <p class="small muted" style="margin:0">No feature is. Paid plans add owner convenience at scale. Reading and exporting your own records is free on every plan and always will be.</p>
+    </div>
+    <div class="card" style="margin-top:1rem">
+      <h3>Can Isola pay my team for me?</h3>
+      <p class="small muted" style="margin:0">No, and it never will. Isola produces a file listing what each person is owed, which you upload to your own bank and authorise yourself. CSV for most banks, NACHA for the United States, SEPA for the eurozone, ABA for Australia. The file contains no bank account details.</p>
+    </div>
+    <div class="card" style="margin-top:1rem">
+      <h3>Can I move an existing team onto Isola?</h3>
+      <p class="small muted" style="margin:0">Yes. Record what each person was owed on the day you start, and the books begin from there rather than pretending nobody is owed anything.</p>
+    </div>
+    <div class="card" style="margin-top:1rem">
+      <h3>What can I send my accountant?</h3>
+      <p class="small muted" style="margin:0">A general ledger of every transaction, and a reconciliation showing opening, recognised, paid and closing figures per person. Both take a date range and download as Excel, CSV or JSON &mdash; and both are on the read-only link you give them, so they need not ask you.</p>
     </div>
   </section>
 <footer>
