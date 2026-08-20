@@ -72,12 +72,12 @@ Yearly billing is ten months charged for twelve — a 17% discount on every plan
 - Months opened and locked automatically, if you want that
 - Expenses and recoupable advances
 - Profit and loss across places and streams
-- A Discord bot for checking balances and approving splits in chat
+- Discord and Telegram bots for checking balances and approving splits in chat
 - Six languages: English, Spanish, Brazilian Portuguese, French, German, Japanese
 
 ## Using it
 
-**Adding the Discord bot.** Open your team, go to the Discord tab, and press
+**Adding the Discord or Telegram bot.** Open your team, go to the Chat apps tab, and press
 Link Discord. You get a code, then run `/link` with it in any server the bot
 is in. The code expires in 15 minutes and works once. If the bot is not in
 your server yet, an owner adds it from the link on the Discord tab — it needs
@@ -93,11 +93,22 @@ updates, `/chase` reminds whoever has not approved, and `/upgrade` shows your
 plan — all owner-only. `/owed`, `/pnl` and `/studio` are owner conveniences on
 paid plans.
 
+**On Telegram** the same commands work, because a Telegram message is
+translated into the same handler rather than a second implementation. The one
+difference is privacy: Telegram cannot reply so that only the asker sees it,
+so a private answer requested in a group is sent to that person directly and
+the group is told only that it was sent. Nobody's figures appear in a room
+they did not choose.
+
 Isola posts to that channel when a month is estimated and when it settles,
 naming the team total and never an individual share. It also posts when a
 split has been waiting on somebody for more than three days.
 
-**Adding a place.** Islands tab, Add a place. Choose the platform, give it a
+**Adding a place.** Islands tab, Add a place. Type the code and Isola looks it
+up — Epic's public ecosystem API for Fortnite, Roblox's for experiences — and
+offers the name so it need not be typed twice. Minecraft and FiveM have no
+public endpoint for this, so those stay manual. The lookup is a convenience
+and never a gate: if it fails, you type the name yourself. Choose the platform, give it a
 name, and add the code players use to find it if your platform has one.
 Minecraft and FiveM have no player-facing code, so that field is optional
 there.
