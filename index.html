@@ -21,9 +21,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
 <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="preload" href="/fonts/inter.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="stylesheet" href="/style.css" />
 <script type="application/ld+json">
 {
@@ -156,7 +154,7 @@
           "name": "Is anything locked behind a paid plan?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "No feature is. Paid plans add owner convenience at scale \u2014 scheduled statements, a year-end pack, automatic exchange rates and API access. Reading and exporting your own records is free on every plan and always will be."
+            "text": "Nothing your collaborators need. Every contributor can see, check and export their own records on every plan, free. Paid plans add conveniences for whoever runs the team \u2014 scheduled statements, a year-end pack, automatic exchange rates, more than one owner and API access."
           }
         },
         {
@@ -192,92 +190,114 @@
 </head>
 <body>
 
+<header class="top" id="top">
 <div class="wrap">
   <nav>
     <a href="/" class="mark"><svg class="mark-icon" viewBox="80 84 352 372" aria-hidden="true" fill="currentColor"><path d="M88 256 L178 128 L236 202 L302 92 L424 256 Z"/><path opacity=".3" d="M88 284 L178 412 L236 338 L302 448 L424 284 Z"/></svg>Isola</a>
     <div class="links">
-      <a href="#how" class="quiet">How it works</a>
-      <a href="#discord" class="quiet">Chat apps</a>
-      <a href="#pricing" class="quiet">Pricing</a>
+      <a href="#how" class="quiet opt">How it works</a>
+      <a href="#discord" class="quiet opt">Chat apps</a>
+      <a href="#pricing" class="quiet opt">Pricing</a>
       <a href="/demo" class="quiet">Demo</a>
       <a href="https://app.isola.gg" class="btn">Sign in</a>
     </div>
   </nav>
 </div>
+</header>
 
 <main>
+<div class="hero-band">
 <div class="wrap">
-  <section class="hero" style="border:none">
+  <section class="hero">
     <div>
-      <h1>Split creator payouts without the spreadsheet argument.</h1>
+      <div class="badge"><i>NEW</i> Telegram bot, in thirteen languages</div>
+      <h1>Split creator payouts <em>without the spreadsheet argument.</em></h1>
       <p class="lede">For teams splitting revenue on Fortnite, Roblox, Minecraft and FiveM.
         Isola keeps a payout record every collaborator can see &mdash; and nobody,
         including the owner, can quietly edit.</p>
-
-      <ul class="platforms">
+      <div class="cta-row">
+        <a href="/demo" class="btn solid">See the demo <span class="arr" aria-hidden="true">&rarr;</span></a>
+        <a href="https://app.isola.gg" class="btn">Create a team</a>
+      </div>
+      <ul class="platforms" aria-label="Supported platforms">
         <li><span></span>Fortnite</li>
         <li><span></span>Roblox</li>
         <li><span></span>Minecraft</li>
         <li><span></span>FiveM</li>
       </ul>
-      <div class="cta-row">
-        <a href="/demo" class="btn solid">See the demo</a>
-        <a href="https://app.isola.gg" class="btn">Create a team</a>
-      </div>
-      <p class="small muted" style="margin-top:1rem">Free under $2,000 a month. No card to sign up, and the demo needs no account at all.</p>
+      <p class="fine">Free under $2,000 a month. No card to sign up, and the demo needs no account at all.</p>
     </div>
 
-    <div class="ledger">
-      <div class="cap"><span>Statement of account &mdash; Sam T.</span><span>September</span></div>
-      <table>
-        <tbody>
-          <tr class="row-anim" style="animation-delay:.1s">
-            <td>Provisional credit</td><td class="r pos">+3,098.40</td><td class="r muted">3,098.40</td>
-          </tr>
-          <tr class="row-anim" style="animation-delay:.7s">
-            <td>Estimate reversed</td><td class="r neg">&minus;3,098.40</td><td class="r muted">0.00</td>
-          </tr>
-          <tr class="row-anim" style="animation-delay:1.1s">
-            <td>Final credit</td><td class="r pos">+2,990.00</td><td class="r muted">2,990.00</td>
-          </tr>
-          <tr class="row-anim" style="animation-delay:1.5s">
-            <td>Payment received<span class="blurb" style="display:block;font-size:.8rem;color:var(--text-3)">PP-7761224</span></td>
-            <td class="r neg">&minus;1,495.00</td><td class="r muted">1,495.00</td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="foot row-anim" style="animation-delay:1.9s">
-        <span>Owed to Sam</span><span>$1,495.00</span>
+    <div class="ledger-stack">
+      <div class="ledger" aria-label="Example statement of account">
+        <div class="cap"><span><strong>Sam T.</strong> &middot; statement of account</span><span class="locked">September &middot; locked</span></div>
+        <table>
+          <tbody>
+            <tr class="row-anim" style="animation-delay:.15s">
+              <td>Provisional credit<span class="note">Platform estimate, 2 Sep</span></td><td class="r pos">+3,098.40</td><td class="r muted">3,098.40</td>
+            </tr>
+            <tr class="row-anim struck" style="animation-delay:.75s">
+              <td>Estimate reversed<span class="note">Withdrawn on the record, not edited</span></td><td class="r neg">&minus;3,098.40</td><td class="r muted">0.00</td>
+            </tr>
+            <tr class="row-anim" style="animation-delay:1.15s">
+              <td>Final credit<span class="note">Settled figure, 30 Oct</span></td><td class="r pos">+2,990.00</td><td class="r muted">2,990.00</td>
+            </tr>
+            <tr class="row-anim" style="animation-delay:1.55s">
+              <td>Payment received<span class="note">Ref PP-7761224</span></td>
+              <td class="r neg">&minus;1,495.00</td><td class="r muted">1,495.00</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="foot row-anim" style="animation-delay:1.95s">
+          <span>Owed to Sam</span><span class="num">$1,495.00</span>
+        </div>
       </div>
     </div>
   </section>
+</div>
+</div>
 
+<div class="band">
+<div class="wrap">
   <section>
-    <div class="eyebrow">The problem</div>
-    <h2>The platform pays one account. Your team is several people.</h2>
-    <p class="lede">And the number moves after you&rsquo;ve already told everyone what they&rsquo;re getting.</p>
-    <div class="grid" style="margin-top:2rem">
+    <div class="head split">
+      <div>
+        <div class="eyebrow"><b>01</b> The problem</div>
+        <h2>The platform pays one account. Your team is several people.</h2>
+      </div>
+      <p class="lede">And the number moves after you&rsquo;ve already told everyone what they&rsquo;re getting.</p>
+    </div>
+    <div class="grid">
       <div class="card">
+        <span class="idx">A</span>
         <h3>The estimate isn&rsquo;t final</h3>
         <p>Creator Portal shows a figure, then posts the real one roughly 30 days
           after the period closes. They don&rsquo;t have to match.</p>
       </div>
       <div class="card">
+        <span class="idx">B</span>
         <h3>Spreadsheets get edited</h3>
         <p>Someone fixes a formula by hand in November. In February nobody can
           reconstruct why September changed.</p>
       </div>
       <div class="card">
+        <span class="idx">C</span>
         <h3>Then you&rsquo;re the one chasing</h3>
         <p>You did the maths, you absorb the argument, and every January someone
           asks you for their earnings for tax.</p>
       </div>
     </div>
   </section>
+</div>
+</div>
 
-  <section id="how">
-    <div class="eyebrow">How it works</div>
-    <h2>Agree it once. The ledger does the rest.</h2>
+<div class="band alt" id="how">
+<div class="wrap">
+  <section>
+    <div class="head">
+      <div class="eyebrow"><b>02</b> How it works</div>
+      <h2>Agree it once. The ledger does the rest.</h2>
+    </div>
     <div class="steps">
       <div class="step">
         <h3>Set the split per place</h3>
@@ -296,28 +316,39 @@
       </div>
       <div class="step">
         <h3>Everyone sees their own account</h3>
-        <p class="muted small">Running balance, what&rsquo;s been paid, and a CSV their
-          accountant can actually use.</p>
+        <p class="muted small">Running balance, what&rsquo;s been paid, and an export
+          their accountant can actually use.</p>
       </div>
     </div>
   </section>
+</div>
+</div>
 
+<div class="band">
+<div class="wrap">
   <section>
-    <div class="eyebrow">Why not a spreadsheet</div>
-    <h2>A locked period cannot quietly change.</h2>
-    <p class="lede">That&rsquo;s the whole product. The maths is the easy part.</p>
-    <div class="grid" style="margin-top:2rem">
+    <div class="head split">
+      <div>
+        <div class="eyebrow"><b>03</b> Why not a spreadsheet</div>
+        <h2>A locked period cannot quietly change.</h2>
+      </div>
+      <p class="lede">That&rsquo;s the whole product. The maths is the easy part.</p>
+    </div>
+    <div class="grid">
       <div class="card">
+        <span class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg></span>
         <h3>Estimates are reversed, not edited</h3>
         <p>When the final arrives, the estimate is withdrawn on the record and the
           settled figure booked. You can always show what was believed and when it changed.</p>
       </div>
       <div class="card">
+        <span class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg></span>
         <h3>Nobody is asked to send money back</h3>
         <p>A downward revision becomes a negative adjustment on next month.
           Clawing back cash someone already spent is how these arrangements end.</p>
       </div>
       <div class="card">
+        <span class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l3 3v15H6z"/><path d="M9 13h6M9 17h4M9 9h3"/></svg></span>
         <h3>Every split is versioned and signed</h3>
         <p>September reconciles against the split September locked with. Later
           changes create a new version and leave the old one intact.</p>
@@ -325,10 +356,12 @@
     </div>
   </section>
 
-  <section>
-    <div class="eyebrow">Also in the box</div>
-    <h2>The unglamorous parts, done properly.</h2>
-    <div class="grid" style="margin-top:2rem">
+  <section style="padding-top:0">
+    <div class="head">
+      <div class="eyebrow"><b>04</b> Also in the box</div>
+      <h2>The unglamorous parts, done properly.</h2>
+    </div>
+    <div class="grid">
       <div class="card">
         <h3>Bank reconciliation</h3>
         <p>Import your statement and see what you recorded against what actually
@@ -336,7 +369,7 @@
       </div>
       <div class="card">
         <h3>Statements they can keep</h3>
-        <p>Every contributor exports their own running record as CSV &mdash; opening
+        <p>Every contributor exports their own running record &mdash; opening
           balance, what was credited, what was paid, closing balance.</p>
       </div>
       <div class="card">
@@ -346,18 +379,26 @@
       </div>
     </div>
   </section>
+</div>
+</div>
 
+<div class="band alt" id="discord">
+<div class="wrap">
+  <section>
+    <div class="head split">
+      <div>
+        <div class="eyebrow"><b>05</b> Discord and Telegram</div>
+        <h2>Your team already has a group chat. Isola works in it.</h2>
+      </div>
+      <p class="lede">Balances and approvals without anyone opening a dashboard.
+        Replies are private to whoever ran the command, so nobody learns what
+        anyone else is owed &mdash; on Telegram, where a group reply would be
+        public, the answer is sent to you directly instead.</p>
+    </div>
 
-  <section id="discord">
-    <div class="eyebrow">Discord and Telegram</div>
-    <h2>Your team already has a group chat. Isola works in it.</h2>
-    <p class="lede">Balances and approvals without anyone opening a dashboard.
-      Replies are private to whoever ran the command, so nobody learns what
-      anyone else is owed &mdash; on Telegram, where a group reply would be
-      public, the answer is sent to you directly instead.</p>
-
-    <div style="margin-top:2rem">
+    <div class="chat-pair">
       <div class="chat">
+        <div class="who"><span class="av"><svg viewBox="80 84 352 372" fill="currentColor" aria-hidden="true"><path d="M88 256 L178 128 L236 202 L302 92 L424 256 Z"/><path opacity=".3" d="M88 284 L178 412 L236 338 L302 448 L424 284 Z"/></svg></span><b>Isola</b><span class="tag">BOT</span></div>
         <div class="cmd">/<b>statement</b></div>
         <div class="line">
           <strong>Neon Heist Studio</strong> — statement of account<br>
@@ -367,10 +408,11 @@
           <span class="date">2026-11-03</span> Part payment, rest to follow <span class="down">−$1,495.00</span>
         </div>
         <div class="owed">Owed to you: $1,495.00</div>
-        <div class="only-you">Only you can see this</div>
+        <div class="only-you"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>Only you can see this</div>
       </div>
 
       <div class="chat">
+        <div class="who"><span class="av"><svg viewBox="80 84 352 372" fill="currentColor" aria-hidden="true"><path d="M88 256 L178 128 L236 202 L302 92 L424 256 Z"/><path opacity=".3" d="M88 284 L178 412 L236 338 L302 448 L424 284 Z"/></svg></span><b>Isola</b><span class="tag">BOT</span></div>
         <div class="cmd">/<b>approve</b></div>
         <div class="line">
           <strong>Neon Heist Studio</strong> — split version 2 needs your approval<br>
@@ -385,227 +427,254 @@
       <a href="https://t.me/isolagg_bot" class="btn solid" target="_blank" rel="noopener">Add Isola to Telegram</a>
       <a href="/demo" class="btn">See the rest</a>
     </div>
-    <p class="small muted" style="margin-top:1rem">Fifteen commands, and <code>/help</code> explains the rest.
+    <p class="fine">Sixteen commands, and <code>/help</code> explains the rest.
       Isola only reads messages that mention it directly.</p>
   </section>
+</div>
+</div>
 
-  <section id="pricing">
-    <div class="eyebrow">Pricing</div>
-    <h2>Priced on what you handle, not how many people you add.</h2>
-    <p class="lede">Charging per collaborator would penalise you for adding the
-      people whose visibility is the point.</p>
-    <p class="small muted" style="margin-top:-.4rem">Pay yearly and get two months free
-      &mdash; 17% off every plan.</p>
+<div class="band" id="pricing">
+<div class="wrap">
+  <section>
+    <div class="head split">
+      <div>
+        <div class="eyebrow"><b>06</b> Pricing</div>
+        <h2>Priced on what you handle, not how many people you add.</h2>
+      </div>
+      <p class="lede">Charging per collaborator would penalise you for adding the
+        people whose visibility is the point. Pay yearly and get two months free &mdash; 17% off every plan.</p>
+    </div>
 
-    <table class="plans">
-      <thead>
-        <tr><th>Plan</th><th class="r">Monthly payouts up to</th><th class="r">Price</th></tr>
-      </thead>
-      <tbody>
-        <tr><td class="name">Free<span class="blurb">Still finding an audience</span></td>
-            <td class="r">$2,000</td><td class="r">Free</td></tr>
-        <tr><td class="name">Starter<span class="blurb">Splitting real money every month</span></td>
-            <td class="r">$25,000</td><td class="r">$39</td></tr>
-        <tr><td class="name">Studio<span class="blurb">Several places, bank reconciliation</span></td>
-            <td class="r">$100,000</td><td class="r">$89</td></tr>
-        <tr><td class="name">Pro<span class="blurb">Top of the Discover charts</span></td>
-            <td class="r">no limit</td><td class="r">$199</td></tr>
-      </tbody>
-    </table>
-
-    <div class="card" style="margin-top:2rem">
-      <h3>Four platforms, one set of books <span class="pill">multi-platform</span></h3>
-      <p class="small muted" style="margin:0 0 .2rem">Chosen per team and per place, so a studio
-        running an island and an experience keeps one ledger rather than two. Isola knows which
-        revenue streams settle in two stages and which do not, so it only warns you about a
-        figure moving when a figure moving is unexpected.</p>
-
-      <div class="platform-grid">
-        <div class="platform-card">
-          <h4>Fortnite</h4>
-          <p class="what">Islands</p>
-          <ul>
-            <li>Engagement payout</li>
-            <li>In-island transactions</li>
-            <li>Support-a-Creator</li>
-            <li>Sponsored row</li>
-          </ul>
-          <p class="what" style="margin:.7rem 0 0">Engagement is the one that moves between estimate and final.</p>
-        </div>
-        <div class="platform-card">
-          <h4>Roblox</h4>
-          <p class="what">Experiences</p>
-          <ul>
-            <li>Engagement payout</li>
-            <li>Game passes</li>
-            <li>Developer products</li>
-            <li>Premium payouts</li>
-            <li>Paid access</li>
-          </ul>
-          <p class="what" style="margin:.7rem 0 0">Engagement and Premium payouts are the ones that move.</p>
-        </div>
-        <div class="platform-card">
-          <h4>Minecraft</h4>
-          <p class="what">Servers and maps</p>
-          <ul>
-            <li>Marketplace sales</li>
-            <li>Character Creator items</li>
-            <li>Server store</li>
-            <li>Subscriptions</li>
-          </ul>
-          <p class="what" style="margin:.7rem 0 0">Nothing here settles in two stages, so nothing is expected to move.</p>
-        </div>
-        <div class="platform-card">
-          <h4>FiveM</h4>
-          <p class="what">Servers</p>
-          <ul>
-            <li>Store sales</li>
-            <li>Donations</li>
-            <li>Subscriptions</li>
-            <li>Asset sales</li>
-          </ul>
-          <p class="what" style="margin:.7rem 0 0">Nothing here settles in two stages, so nothing is expected to move.</p>
-        </div>
+    <div class="plans-grid">
+      <div class="plan lead">
+        <h3>Free <span class="pill">start here</span></h3>
+        <p class="who">Still finding an audience</p>
+        <div class="price">$0</div>
+        <div class="cap">Monthly payouts up to <span class="num">$2,000</span></div>
+      </div>
+      <div class="plan">
+        <h3>Starter</h3>
+        <p class="who">Splitting real money every month</p>
+        <div class="price">$39<small>/mo</small></div>
+        <div class="cap">Monthly payouts up to <span class="num">$25,000</span></div>
+      </div>
+      <div class="plan">
+        <h3>Studio</h3>
+        <p class="who">Several places, bank reconciliation</p>
+        <div class="price">$89<small>/mo</small></div>
+        <div class="cap">Monthly payouts up to <span class="num">$100,000</span></div>
+      </div>
+      <div class="plan">
+        <h3>Pro</h3>
+        <p class="who">Top of the Discover charts</p>
+        <div class="price">$199<small>/mo</small></div>
+        <div class="cap">Monthly payouts: <span class="num">no limit</span></div>
       </div>
     </div>
 
-    <div class="card" style="margin-top:1.1rem">
-      <h3>Every feature, every plan <span class="pill">no gates</span></h3>
-      <p class="small muted" style="margin:0 0 1.1rem">Price follows the volume you handle and
-        nothing else.</p>
-      <ul class="ticks" style="columns:2; column-gap:2rem">
-        <li style="break-inside:avoid"><span>An account for every contributor</span></li>
-        <li style="break-inside:avoid"><span>Splits per place, versioned and unanimously approved</span></li>
-        <li style="break-inside:avoid"><span>Provisional and final figures, reconciled automatically</span></li>
-        <li style="break-inside:avoid"><span>Statement of account, readable and exportable by each person</span></li>
-        <li style="break-inside:avoid"><span>Bank reconciliation against your own statement</span></li>
-        <li style="break-inside:avoid"><span>Expenses and recoupable advances</span></li>
-        <li style="break-inside:avoid"><span>Profit and loss across places and streams</span></li>
-        <li style="break-inside:avoid"><span>Read-only books access for your accountant</span></li>
-        <li style="break-inside:avoid"><span>A full snapshot export, for a year end or a dispute</span></li>
-        <li style="break-inside:avoid"><span>Reusable split templates and approval deadlines</span></li>
-        <li style="break-inside:avoid"><span>The Discord and Telegram bots: balance, statement and approvals in chat</span></li>
-        <li style="break-inside:avoid"><span>Notifications when a period is posted</span></li>
-        <li style="break-inside:avoid"><span>Payment files for your bank &mdash; CSV, NACHA, SEPA or ABA</span></li>
-        <li style="break-inside:avoid"><span>Opening balances, so a team with history keeps it</span></li>
-        <li style="break-inside:avoid"><span>A books check anyone on the team can run</span></li>
-        <li style="break-inside:avoid"><span>Excel, CSV and JSON exports with a date range</span></li>
-        <li style="break-inside:avoid"><span>A journal your accountant can import, rather than retype</span></li>
-        <li style="break-inside:avoid"><span>Months opened and locked for you, if you want that</span></li>
-        <li style="break-inside:avoid"><span>Payments that record themselves when your statement arrives</span></li>
-      </ul>
-    </div>
+    <div class="stack" style="margin-top:1rem">
+      <div class="card">
+        <h3>Everything your team needs, on every plan <span class="pill">included</span></h3>
+        <p class="small" style="margin:0 0 .4rem">Price follows the volume you handle. None of this costs more.</p>
+        <ul class="ticks cols">
+          <li><span>An account for every contributor</span></li>
+          <li><span>Splits per place, versioned and unanimously approved</span></li>
+          <li><span>Provisional and final figures, reconciled automatically</span></li>
+          <li><span>Statement of account, readable and exportable by each person</span></li>
+          <li><span>Bank reconciliation against your own statement</span></li>
+          <li><span>Expenses and recoupable advances</span></li>
+          <li><span>Profit and loss across places and streams</span></li>
+          <li><span>Read-only books access for your accountant</span></li>
+          <li><span>A full snapshot export, for a year end or a dispute</span></li>
+          <li><span>Reusable split templates and approval deadlines</span></li>
+          <li><span>The Discord and Telegram bots: balance, statement and approvals in chat</span></li>
+          <li><span>Notifications when a period is posted</span></li>
+          <li><span>Payment files for your bank &mdash; CSV, NACHA, SEPA or ABA</span></li>
+          <li><span>Opening balances, so a team with history keeps it</span></li>
+          <li><span>A books check anyone on the team can run</span></li>
+          <li><span>Excel, CSV and JSON exports with a date range</span></li>
+          <li><span>A journal your accountant can import, rather than retype</span></li>
+          <li><span>Months opened and locked for you, if you want that</span></li>
+          <li><span>Payments that record themselves when your statement arrives</span></li>
+        </ul>
+      </div>
 
-    <div class="card" style="margin-top:1.1rem">
-      <h3>What each paid plan adds <span class="pill amber">owner only</span></h3>
-      <p class="small muted" style="margin:0 0 1.1rem">Conveniences for whoever runs the team.
-        Everything your collaborators need to check what they are owed stays free.</p>
-      <p style="margin:1rem 0 .3rem; font-weight:500; font-size:.92rem">Starter adds</p>
-      <ul class="ticks">
-        <li><span>Monthly statements emailed to every contributor, automatically</span></li>
-        <li><span><code>/owed</code> and <code>/pnl</code> in Discord</span></li>
-      </ul>
-      <p style="margin:1rem 0 .3rem; font-weight:500; font-size:.92rem">Studio adds</p>
-      <ul class="ticks">
-        <li><span>The year-end pack, ready for your accountant</span></li>
-        <li><span>Exchange rates fetched automatically for each period</span></li>
-        <li><span>As many accountant links as you need</span></li>
-        <li><span><code>/studio</code> in Discord</span></li>
-      </ul>
-      <p style="margin:1rem 0 .3rem; font-weight:500; font-size:.92rem">Pro adds</p>
-      <ul class="ticks">
-        <li><span>Read-only API access, for pulling your books into your own dashboards</span></li>
-        <li><span>More than one owner on a team</span></li>
-        <li><span>Priority support</span></li>
-      </ul>
-    </div>
-    <div class="card" style="margin-top:1.1rem">
-      <h3>Free forever, on every plan <span class="pill">always</span></h3>
-      <ul class="ticks">
-        <li><span>Reading your own statement of account</span><span class="muted">free</span></li>
-        <li><span>Exporting it for your accountant</span><span class="muted">free</span></li>
-        <li><span>An account for every contributor</span><span class="muted">free</span></li>
-        <li><span>Posting new figures</span><span class="muted">needs the right plan</span></li>
-      </ul>
-      <p class="small muted" style="margin-top:1rem">Contributors don&rsquo;t choose the plan.
-        Locking someone out of their own financial records over an invoice isn&rsquo;t
-        something a bookkeeping tool gets to do.</p>
-    </div>
-  </section>
+      <div class="card">
+        <h3>What each paid plan adds <span class="pill amber">owner conveniences</span></h3>
+        <p class="small" style="margin:0">For whoever runs the team. Everything your collaborators
+          need to check what they are owed stays free.</p>
+        <div class="addons">
+          <div>
+            <h4>Starter adds</h4>
+            <ul class="ticks">
+              <li><span>Monthly statements emailed to every contributor, automatically</span></li>
+              <li><span><code>/owed</code> and <code>/pnl</code> in chat</span></li>
+            </ul>
+          </div>
+          <div>
+            <h4>Studio adds</h4>
+            <ul class="ticks">
+              <li><span>The year-end pack, ready for your accountant</span></li>
+              <li><span>Exchange rates fetched automatically for each period</span></li>
+              <li><span>As many accountant links as you need</span></li>
+              <li><span><code>/studio</code> in chat</span></li>
+            </ul>
+          </div>
+          <div>
+            <h4>Pro adds</h4>
+            <ul class="ticks">
+              <li><span>Read-only API access, for your own dashboards</span></li>
+              <li><span>More than one owner on a team</span></li>
+              <li><span>Priority support</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
 
-  <section>
-    <h2>Isola records. It never moves money.</h2>
-    <p class="lede">The platform pays you, you pay your team through your own bank, and
-      Isola keeps the record straight. Nothing passes through us &mdash; which is
-      exactly why there&rsquo;s nothing to go wrong with it.</p>
-    <div class="cta-row">
-      <a href="/demo" class="btn solid">Open the demo</a>
-      <a href="https://app.isola.gg" class="btn">Create a team</a>
+      <div class="card">
+        <h3>Free forever, on every plan <span class="pill">always</span></h3>
+        <ul class="ticks">
+          <li><span>Reading your own statement of account</span><span class="muted">free</span></li>
+          <li><span>Exporting it for your accountant</span><span class="muted">free</span></li>
+          <li><span>An account for every contributor</span><span class="muted">free</span></li>
+          <li><span>Posting new figures</span><span class="muted">needs the right plan</span></li>
+        </ul>
+        <p class="small" style="margin-top:1rem">Contributors don&rsquo;t choose the plan.
+          Locking someone out of their own financial records over an invoice isn&rsquo;t
+          something a bookkeeping tool gets to do.</p>
+      </div>
+
+      <div class="card">
+        <h3>Four platforms, one set of books <span class="pill">multi-platform</span></h3>
+        <p class="small" style="margin:0">Chosen per team and per place, so a studio
+          running an island and an experience keeps one ledger rather than two. Isola knows which
+          revenue streams settle in two stages and which do not, so it only warns you about a
+          figure moving when a figure moving is unexpected.</p>
+        <div class="platform-grid">
+          <div class="platform-card">
+            <h4>Fortnite</h4>
+            <p class="what">Islands</p>
+            <ul><li>Engagement payout</li><li>In-island transactions</li><li>Support-a-Creator</li><li>Sponsored row</li></ul>
+            <p class="moves">Engagement is the one that moves between estimate and final.</p>
+          </div>
+          <div class="platform-card">
+            <h4>Roblox</h4>
+            <p class="what">Experiences</p>
+            <ul><li>Engagement payout</li><li>Game passes</li><li>Developer products</li><li>Premium payouts</li><li>Paid access</li></ul>
+            <p class="moves">Engagement and Premium payouts are the ones that move.</p>
+          </div>
+          <div class="platform-card">
+            <h4>Minecraft</h4>
+            <p class="what">Servers and maps</p>
+            <ul><li>Marketplace sales</li><li>Character Creator items</li><li>Server store</li><li>Subscriptions</li></ul>
+            <p class="moves">Nothing here settles in two stages, so nothing is expected to move.</p>
+          </div>
+          <div class="platform-card">
+            <h4>FiveM</h4>
+            <p class="what">Servers</p>
+            <ul><li>Store sales</li><li>Donations</li><li>Subscriptions</li><li>Asset sales</li></ul>
+            <p class="moves">Nothing here settles in two stages, so nothing is expected to move.</p>
+          </div>
+        </div>
+      </div>
     </div>
-    <p class="small muted" style="margin-top:1rem">The demo runs entirely in your
-      browser with a worked example. No sign-up.</p>
   </section>
 </div>
+</div>
 
-
-  <section id="faq" style="margin-top:3.5rem">
-    <h2>Questions</h2>
-    <div class="card" style="margin-top:1rem">
-      <h3>Does Isola hold or move my money?</h3>
-      <p class="small muted" style="margin:0">No. The platform pays you, you pay your team through your own bank, and Isola keeps the record. There is no float, no custody, and no cut of the payout.</p>
+<div class="band alt" id="faq">
+<div class="wrap">
+  <section>
+    <div class="head split">
+      <div>
+        <div class="eyebrow"><b>07</b> Questions</div>
+        <h2>The things people ask first.</h2>
+      </div>
+      <p class="lede">Something not answered here? Email isola@sundappleapp.com and a person replies.</p>
     </div>
-    <div class="card" style="margin-top:1rem">
-      <h3>What happens when a payout is revised after I have told everyone?</h3>
-      <p class="small muted" style="margin:0">The provisional credit is reversed and replaced by the final figure rather than edited, and the difference carries into the next month. Nobody is ever asked to send money back.</p>
-    </div>
-    <div class="card" style="margin-top:1rem">
-      <h3>Can the team owner quietly change a figure?</h3>
-      <p class="small muted" style="margin:0">No. Statements are frozen when posted, so a September statement reads identically in December. Every split version, approval, figure and payment is recorded with who did it and when, and nothing can be removed.</p>
-    </div>
-    <div class="card" style="margin-top:1rem">
-      <h3>Can a contributor check the books themselves?</h3>
-      <p class="small muted" style="margin:0">Yes. Any team member can run the books check, not just the owner. A verification only the owner can run verifies nothing.</p>
-    </div>
-    <div class="card" style="margin-top:1rem">
-      <h3>Which platforms does Isola support?</h3>
-      <p class="small muted" style="margin:0">Fortnite islands, Roblox experiences, Minecraft
-        servers and maps, and FiveM servers. A team can run places on more than one platform
-        and keep one set of books.</p>
-    </div>
-    <div class="card" style="margin-top:1rem">
-      <h3>Does it cost more to add collaborators?</h3>
-      <p class="small muted" style="margin:0">No. Pricing follows the volume your team handles, not how many people are on it. Everyone gets an account on every plan, including free.</p>
-    </div>
-    <div class="card" style="margin-top:1rem">
-      <h3>Is anything locked behind a paid plan?</h3>
-      <p class="small muted" style="margin:0">No feature is. Paid plans add owner convenience at scale. Reading and exporting your own records is free on every plan and always will be.</p>
-    </div>
-    <div class="card" style="margin-top:1rem">
-      <h3>Can Isola pay my team for me?</h3>
-      <p class="small muted" style="margin:0">No, and it never will. Isola produces a file listing what each person is owed, which you upload to your own bank and authorise yourself. CSV for most banks, NACHA for the United States, SEPA for the eurozone, ABA for Australia. The file contains no bank account details.</p>
-    </div>
-    <div class="card" style="margin-top:1rem">
-      <h3>Can I move an existing team onto Isola?</h3>
-      <p class="small muted" style="margin:0">Yes. Record what each person was owed on the day you start, and the books begin from there rather than pretending nobody is owed anything.</p>
-    </div>
-    <div class="card" style="margin-top:1rem">
-      <h3>What can I send my accountant?</h3>
-      <p class="small muted" style="margin:0">A general ledger of every transaction, and a reconciliation showing opening, recognised, paid and closing figures per person. Both take a date range and download as Excel, CSV or JSON &mdash; and both are on the read-only link you give them, so they need not ask you.</p>
+    <div class="faq">
+      <details open>
+        <summary><h3>Does Isola hold or move my money?</h3></summary>
+        <p>No. The platform pays you, you pay your team through your own bank, and Isola keeps the record. There is no float, no custody, and no cut of the payout.</p>
+      </details>
+      <details>
+        <summary><h3>What happens when a payout is revised after I have told everyone?</h3></summary>
+        <p>The provisional credit is reversed and replaced by the final figure rather than edited, and the difference carries into the next month. Nobody is ever asked to send money back.</p>
+      </details>
+      <details>
+        <summary><h3>Can the team owner quietly change a figure?</h3></summary>
+        <p>No. Statements are frozen when posted, so a September statement reads identically in December. Every split version, approval, figure and payment is recorded with who did it and when, and nothing can be removed.</p>
+      </details>
+      <details>
+        <summary><h3>Can a contributor check the books themselves?</h3></summary>
+        <p>Yes. Any team member can run the books check, not just the owner. A verification only the owner can run verifies nothing.</p>
+      </details>
+      <details>
+        <summary><h3>Which platforms does Isola support?</h3></summary>
+        <p>Fortnite islands, Roblox experiences, Minecraft servers and maps, and FiveM servers. A team can run places on more than one platform and keep one set of books.</p>
+      </details>
+      <details>
+        <summary><h3>Does it cost more to add collaborators?</h3></summary>
+        <p>No. Pricing follows the volume your team handles, not how many people are on it. Everyone gets an account on every plan, including free.</p>
+      </details>
+      <details>
+        <summary><h3>Is anything locked behind a paid plan?</h3></summary>
+        <p>Nothing your collaborators need. Every contributor can see, check and export their own records on every plan, free. Paid plans add conveniences for whoever runs the team &mdash; scheduled statements, a year-end pack, automatic exchange rates, more than one owner and API access.</p>
+      </details>
+      <details>
+        <summary><h3>Can Isola pay my team for me?</h3></summary>
+        <p>No, and it never will. Isola produces a file listing what each person is owed, which you upload to your own bank and authorise yourself. CSV for most banks, NACHA for the United States, SEPA for the eurozone, ABA for Australia. The file contains no bank account details.</p>
+      </details>
+      <details>
+        <summary><h3>Can I move an existing team onto Isola?</h3></summary>
+        <p>Yes. Record what each person was owed on the day you start, and the books begin from there rather than pretending nobody is owed anything.</p>
+      </details>
+      <details>
+        <summary><h3>What can I send my accountant?</h3></summary>
+        <p>A general ledger of every transaction, and a reconciliation showing opening, recognised, paid and closing figures per person. Both take a date range and download as Excel, CSV or JSON &mdash; and both are on the read-only link you give them, so they need not ask you.</p>
+      </details>
     </div>
   </section>
+</div>
+</div>
+
+<div class="wrap">
+  <section>
+    <div class="closer">
+      <h2>Isola records. It never moves money.</h2>
+      <p class="lede">The platform pays you, you pay your team through your own bank, and
+        Isola keeps the record straight. Nothing passes through us &mdash; which is
+        exactly why there&rsquo;s nothing to go wrong with it.</p>
+      <div class="cta-row">
+        <a href="/demo" class="btn solid">Open the demo <span class="arr" aria-hidden="true">&rarr;</span></a>
+        <a href="https://app.isola.gg" class="btn">Create a team</a>
+      </div>
+      <p class="fine">The demo runs entirely in your browser with a worked example. No sign-up.</p>
+    </div>
+  </section>
+</div>
 </main>
 
 <footer>
   <div class="wrap">
-    <div style="display:flex; justify-content:space-between; gap:1rem; flex-wrap:wrap">
-      <span>Isola &mdash; rev-share bookkeeping for creator teams.</span>
-      <span><a href="/demo">Demo</a> · <a href="https://app.isola.gg">Sign in</a> · <a href="/terms">Terms</a> · <a href="/privacy">Privacy</a> · <a href="https://x.com/isolagg" rel="me">X</a> · <a href="https://instagram.com/isola.gg" rel="me">Instagram</a></span>
+    <div class="foot-grid">
+      <a href="/" class="mark"><svg class="mark-icon" viewBox="80 84 352 372" aria-hidden="true" fill="currentColor"><path d="M88 256 L178 128 L236 202 L302 92 L424 256 Z"/><path opacity=".3" d="M88 284 L178 412 L236 338 L302 448 L424 284 Z"/></svg>Isola</a>
+      <div class="foot-links"><a href="/demo">Demo</a><a href="https://app.isola.gg">Sign in</a><a href="/terms">Terms</a><a href="/privacy">Privacy</a><a href="https://x.com/isolagg" rel="me">X</a><a href="https://instagram.com/isola.gg" rel="me">Instagram</a></div>
     </div>
-    <p style="margin-top:1rem; max-width:52ch">Not affiliated with Epic Games, Roblox Corporation, Mojang or Cfx.re.
+    <p class="legal">Isola &mdash; rev-share bookkeeping for creator teams. Isola&trade; is a trade mark of Ibrahim Ahmed.
+      Not affiliated with, endorsed or sponsored by Epic Games, Roblox Corporation, Mojang, Microsoft, Cfx.re, Discord or Telegram;
+      their names are used only to say which platforms Isola works alongside.
       Isola is a record-keeping tool, not an accountant. It records what your
-      team agreed and what was paid; it does not give financial advice.</p>
+      team agreed and what was paid; it does not give financial or tax advice.</p>
   </div>
 </footer>
 
+<script>
+  (function () {
+    var top = document.getElementById('top');
+    function onScroll() { top.classList.toggle('scrolled', window.scrollY > 8); }
+    window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
+  })();
+</script>
 </body>
 </html>

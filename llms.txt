@@ -55,7 +55,7 @@ Priced on the volume a team handles, not on how many people are added. Charging 
 
 Yearly billing is ten months charged for twelve — a 17% discount on every plan.
 
-**Every feature is on every plan.** No feature sits behind a higher tier. What paid plans add is owner convenience at scale: scheduled statements, a year-end pack, automatic exchange rates, unlimited accountant links, read-only API access and extra Discord commands.
+**Everything collaborators need is on every plan.** Seeing, checking and exporting your own records never costs more. What paid plans add is convenience for whoever runs the team: scheduled statements, a year-end pack, automatic exchange rates, unlimited accountant links, read-only API access and more than one owner and extra chat commands.
 
 **Reading and exporting your own records is free on every plan and always will be.** A bookkeeping tool that locks people out of their own records over an invoice has stopped being worth trusting.
 
@@ -87,11 +87,17 @@ permission to read and send messages in the channels you want it in.
 linked anything. `/balance` shows what you are owed. `/statement` shows how it
 got there. `/approve` signs off a split waiting on you. `/period` shows where
 this month has got to. `/split` shows what your team agreed. `/check` confirms
-the books balance and anyone can run it, not just the owner. `/share` gives a
+the books balance and anyone can run it, not just the owner. `/language` sets which language the bot replies in — thirteen, including
+Russian, Turkish, Arabic, Persian, Hindi and Indonesian. `/share` gives a
 link to add Isola to another server. `/here` sets the current channel for team
 updates, `/chase` reminds whoever has not approved, and `/upgrade` shows your
 plan — all owner-only. `/owed`, `/pnl` and `/studio` are owner conveniences on
 paid plans.
+
+**On Telegram** the common commands can be typed in your own alphabet:
+`/баланс`, `/bakiye`, `/saldo`, `/رصيد` and `/शेष` all work like `/balance`.
+Telegram's own command menu must be Latin, but a bot receives anything as an
+ordinary message and can answer it.
 
 **On Telegram** the same commands work, because a Telegram message is
 translated into the same handler rather than a second implementation. The one
